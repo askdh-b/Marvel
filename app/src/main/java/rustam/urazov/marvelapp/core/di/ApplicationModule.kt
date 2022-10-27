@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import rustam.urazov.marvelapp.data.heroesFeed.HeroesRepository
-import rustam.urazov.marvelapp.data.heroesFeed.impl.FakeHeroesRepositoryImpl
+import rustam.urazov.marvelapp.feature.data.heroes.HeroesRepository
+import rustam.urazov.marvelapp.feature.data.heroes.impl.FakeHeroesRepositoryImpl
 import javax.inject.Singleton
 
 @Module
