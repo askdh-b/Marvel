@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -47,19 +49,48 @@ android {
 }
 
 dependencies {
+    //detekt
+    detektPlugins("ru.kode:detekt-rules-compose:1.2.2")
 
+    // coil
+    implementation "io.coil-kt:coil-compose:2.2.2"
+
+    // hilt
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+    implementation 'androidx.hilt:hilt-work:1.0.0'
+    implementation 'com.google.dagger:hilt-android:2.38.1'
+    kapt 'com.google.dagger:hilt-android-compiler:2.38.1'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
+    // material3
+    implementation "androidx.compose.material3:material3:1.0.0-rc01"
+    implementation "androidx.compose.material3:material3-window-size-class:1.0.0-rc01"
+
+    // navigation
+    implementation "androidx.navigation:navigation-compose:2.6.0-alpha02"
+
+    // snapper
     implementation 'dev.chrisbanes.snapper:snapper:0.3.0'
+
+    // appcompanist
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.26.4-beta"
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
+
+    // common
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-    implementation 'androidx.activity:activity-compose:1.6.0'
+    implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation 'androidx.compose.material:material:1.2.1'
+    implementation 'androidx.compose.material:material:1.3.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+}
+
+kapt {
+    correctErrorTypes = true
 }

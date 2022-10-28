@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.ui.theme
+package rustam.urazov.marvelapp.feature.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

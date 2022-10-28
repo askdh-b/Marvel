@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.ui.theme
+package rustam.urazov.marvelapp.feature.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
