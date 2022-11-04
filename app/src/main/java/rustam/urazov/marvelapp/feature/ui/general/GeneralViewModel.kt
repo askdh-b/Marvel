@@ -1,11 +1,11 @@
 package rustam.urazov.marvelapp.feature.ui.general
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import rustam.urazov.marvelapp.R
+import rustam.urazov.marvelapp.core.platform.BaseViewModel
 import rustam.urazov.marvelapp.feature.data.Either
 import rustam.urazov.marvelapp.feature.data.heroes.HeroesRepository
 import rustam.urazov.marvelapp.feature.utils.ErrorMessage
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesRepository) :
-    ViewModel() {
+    BaseViewModel() {
 
     private val viewModelState = MutableStateFlow(GeneralViewModelState(isLoading = true))
 
@@ -34,10 +34,10 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = heroesRepository.getHeroFeed()
+            val result = heroesRepository.getCharacters()
             viewModelState.update {
                 when (result) {
-                    is Either.Right -> it.copy(heroesFeed = result.b, isLoading = false)
+                    is Either.Right -> it.copy(characters = result.b, isLoading = false)
                     is Either.Left -> {
                         val errorMessages = it.errorMessages + ErrorMessage(
                             id = UUID.randomUUID().mostSignificantBits,
@@ -50,21 +50,21 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
         }
     }
 
-    fun changeVisibleHero(visibleHeroId: Int) {
+    fun changeVisibleHero(visibleCharacterId: Int) {
         viewModelState.update {
-            val heroesFeed = it.heroesFeed
-            it.copy(heroesFeed = heroesFeed, visibleHeroId = visibleHeroId, isLoading = false)
+            val characters = it.characters
+            it.copy(characters = characters, visibleCharacterId = visibleCharacterId, isLoading = false)
         }
     }
 
     fun heroDetailsOpen(selectedHero: Int) {
         viewModelScope.launch {
-            val result = heroesRepository.getHeroDetails(selectedHero)
+            val result = heroesRepository.getCharacterDetails(selectedHero)
             viewModelState.update {
                 when (result) {
                     is Either.Right -> it.copy(
-                        visibleHeroId = selectedHero,
-                        isHeroDetailsOpen = true
+                        visibleCharacterId = selectedHero,
+                        isCharacterDetailsOpen = true
                     )
                     is Either.Left -> {
                         val errorMessages = it.errorMessages + ErrorMessage(
@@ -80,7 +80,7 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
 
     fun heroDetailsClose() {
         viewModelState.update {
-            it.copy(isHeroDetailsOpen = false)
+            it.copy(isCharacterDetailsOpen = false)
         }
     }
 

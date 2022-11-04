@@ -16,22 +16,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import rustam.urazov.marvelapp.feature.model.HeroDetails
+import rustam.urazov.marvelapp.feature.model.CharacterView
 import rustam.urazov.marvelapp.feature.ui.theme.Background
 import rustam.urazov.marvelapp.feature.ui.theme.TextColor
 
 @Composable
 fun HeroDetailsScreen(
-    heroDetails: HeroDetails,
+    character: CharacterView,
     onBackClick: () -> Unit
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = Background) {
-        HeroDetails(heroDetails)
+        HeroDetails(character)
         NavigationBar(containerColor = Color(0x00000000)) {
             IconButton(onClick = { onBackClick.invoke() }) {
                 Icon(
@@ -45,11 +44,11 @@ fun HeroDetailsScreen(
 }
 
 @Composable
-fun HeroDetails(heroDetails: HeroDetails) {
+fun HeroDetails(characters: CharacterView) {
     Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
-            model = stringResource(id = heroDetails.imageUrl),
+            model = characters.thumbnail,
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -57,7 +56,7 @@ fun HeroDetails(heroDetails: HeroDetails) {
             Text(
                 modifier = Modifier
                     .padding(bottom = 20.dp, start = 20.dp, end = 20.dp),
-                text = stringResource(id = heroDetails.nameId),
+                text = characters.name,
                 fontFamily = FontFamily.Monospace,
                 color = TextColor,
                 fontSize = 32.sp
@@ -65,7 +64,7 @@ fun HeroDetails(heroDetails: HeroDetails) {
             Text(
                 modifier = Modifier
                     .padding(bottom = 20.dp, start = 20.dp, end = 20.dp),
-                text = stringResource(id = heroDetails.descId),
+                text = characters.description,
                 fontFamily = FontFamily.Monospace,
                 color = TextColor,
                 fontSize = 24.sp

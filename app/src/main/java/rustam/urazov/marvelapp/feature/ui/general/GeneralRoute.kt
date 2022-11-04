@@ -19,7 +19,7 @@ fun GeneralRoute(
         systemUiController = systemUiController,
         onChangeVisibleHero = { generalViewModel.changeVisibleHero(it) },
         onErrorDismiss = { generalViewModel.errorShown(it) },
-        onHeroClick = { generalViewModel.heroDetailsOpen(it) },
+        onHeroClick = {  },
         onBackClick = { generalViewModel.heroDetailsClose() }
     )
 }
@@ -30,7 +30,7 @@ private fun GeneralRoute(
     systemUiController: SystemUiController,
     onChangeVisibleHero: (Int) -> Unit,
     onErrorDismiss: (Long) -> Unit,
-    onHeroClick: (Int) -> Unit,
+    onHeroClick: (String) -> Unit,
     onBackClick: () -> Unit
 ) {
     val generalListLazyListState = rememberLazyListState()
@@ -46,11 +46,11 @@ private fun GeneralRoute(
             )
         }
         GeneralScreenTypes.GeneralScreen -> {
-            TODO()
+
         }
         GeneralScreenTypes.HeroDetailsScreen -> {
             HeroDetailsScreen(
-                heroDetails = (uiState as GeneralUiState.HasHeroes).visibleHero.heroDetails,
+                character = (uiState as GeneralUiState.HasHeroes).visibleCharacter,
                 onBackClick = onBackClick
             )
 
@@ -63,7 +63,7 @@ private fun GeneralRoute(
 private fun getGeneralScreenType(uiState: GeneralUiState): GeneralScreenTypes =
     when (uiState) {
         is GeneralUiState.HasHeroes -> {
-            if (uiState.isHeroDetailsOpen) {
+            if (uiState.isCharacterDetailsOpen) {
                 GeneralScreenTypes.HeroDetailsScreen
             } else {
                 GeneralScreenTypes.GeneralScreenWithHeroesList

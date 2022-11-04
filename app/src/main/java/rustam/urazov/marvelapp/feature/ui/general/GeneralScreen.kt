@@ -23,11 +23,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.SystemUiController
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
 import dev.chrisbanes.snapper.rememberSnapperFlingBehavior
 import rustam.urazov.marvelapp.R
-import rustam.urazov.marvelapp.feature.model.HeroesFeed
+import rustam.urazov.marvelapp.feature.model.CharacterView
 import rustam.urazov.marvelapp.feature.ui.theme.Background
 import rustam.urazov.marvelapp.feature.ui.theme.TextColor
 
@@ -37,7 +38,7 @@ fun GeneralScreen(
     systemUiController: SystemUiController,
     onChangeVisibleHero: (Int) -> Unit,
     onErrorDismiss: (Long) -> Unit,
-    onHeroClick: (Int) -> Unit,
+    onHeroClick: (String) -> Unit,
     generalListLazyListState: LazyListState
 ) {
     Surface(
@@ -49,7 +50,7 @@ fun GeneralScreen(
             is GeneralUiState.HasHeroes -> {
                 GeneralWithHeroesFeed(
                     systemUiController = systemUiController,
-                    heroesFeed = uiState.heroesFeed,
+                    characters = uiState.characters,
                     onChangeVisibleHero = onChangeVisibleHero,
                     onHeroClick = onHeroClick,
                     generalListLazyListState = generalListLazyListState
@@ -70,9 +71,9 @@ fun GeneralScreen(
 @Composable
 fun GeneralWithHeroesFeed(
     systemUiController: SystemUiController,
-    heroesFeed: HeroesFeed,
+    characters: List<CharacterView>,
     onChangeVisibleHero: (Int) -> Unit,
-    onHeroClick: (Int) -> Unit,
+    onHeroClick: (String) -> Unit,
     generalListLazyListState: LazyListState
 ) {
     val position =
@@ -80,14 +81,14 @@ fun GeneralWithHeroesFeed(
 
     systemUiController.apply {
         setStatusBarColor(color = Background)
-        setNavigationBarColor(color = heroesFeed.heroes[position].backgroundColor)
+        setNavigationBarColor(color = Background)
     }
 
-    onChangeVisibleHero.invoke(heroesFeed.heroes[position].nameId)
+    onChangeVisibleHero.invoke(characters[position].id)
 
-    Triangle(color = heroesFeed.heroes[position].backgroundColor)
+    //Triangle(color = characters[position].backgroundColor)
     GeneralWithHeroesFeed(
-        heroesFeed = heroesFeed,
+        characters = characters,
         generalListLazyListState = generalListLazyListState,
         snapperFlingBehavior = rememberSnapperFlingBehavior(generalListLazyListState),
         onHeroClick = onHeroClick
@@ -109,10 +110,10 @@ fun Triangle(color: Color) {
 
 @Composable
 fun GeneralWithHeroesFeed(
-    heroesFeed: HeroesFeed,
+    characters: List<CharacterView>,
     generalListLazyListState: LazyListState,
     snapperFlingBehavior: FlingBehavior,
-    onHeroClick: (Int) -> Unit
+    onHeroClick: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -134,7 +135,7 @@ fun GeneralWithHeroesFeed(
             fontWeight = FontWeight.Bold
         )
         HeroesFeed(
-            heroesFeed = heroesFeed,
+            characters = characters,
             generalListLazyListState = generalListLazyListState,
             snapperFlingBehavior = snapperFlingBehavior,
             onHeroClick = onHeroClick
@@ -144,10 +145,10 @@ fun GeneralWithHeroesFeed(
 
 @Composable
 fun HeroesFeed(
-    heroesFeed: HeroesFeed,
+    characters: List<CharacterView>,
     generalListLazyListState: LazyListState,
     snapperFlingBehavior: FlingBehavior,
-    onHeroClick: (Int) -> Unit
+    onHeroClick: (String) -> Unit
 ) {
     LazyRow(
         modifier = Modifier
@@ -157,11 +158,11 @@ fun HeroesFeed(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        items(heroesFeed.heroes) { hero ->
+        items(characters) { character ->
             Hero(
                 onHeroClick = onHeroClick,
-                imageResource = hero.imageId,
-                text = hero.nameId,
+                imageResource = character.thumbnail,
+                text = character.name,
                 modifier = Modifier
                     .fillMaxSize()
                     .fillParentMaxWidth()
@@ -172,19 +173,19 @@ fun HeroesFeed(
 
 @Composable
 fun Hero(
-    onHeroClick: (Int) -> Unit,
-    imageResource: Int,
-    text: Int,
+    onHeroClick: (String) -> Unit,
+    imageResource: String,
+    text: String,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.clickable { onHeroClick.invoke(text) }) {
-        Image(
+        AsyncImage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 18.dp, vertical = 36.dp)
                 .clip(shape = RoundedCornerShape(15.dp)),
             contentScale = ContentScale.Crop,
-            painter = painterResource(id = imageResource),
+            model = imageResource,
             contentDescription = null,
             alignment = Alignment.Center
         )
@@ -192,7 +193,7 @@ fun Hero(
             modifier = Modifier
                 .align(alignment = Alignment.BottomStart)
                 .padding(start = 36.dp, bottom = 60.dp),
-            text = stringResource(id = text),
+            text = text,
             fontFamily = FontFamily.Monospace,
             color = TextColor,
             fontWeight = FontWeight.Bold,

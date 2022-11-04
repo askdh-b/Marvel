@@ -1,0 +1,32 @@
+package rustam.urazov.marvelapp.feature.data
+
+import retrofit2.Response
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
+import rustam.urazov.marvelapp.feature.model.CharactersResponse
+import javax.inject.Singleton
+
+@Singleton
+interface MarvelApi {
+    companion object {
+        private const val ID = "id"
+        private const val CHARACTERS = "characters"
+        private const val CHARACTER_DETAILS = "public/{$CHARACTERS}/{$ID}"
+    }
+
+    @GET(CHARACTERS)
+    suspend fun characters(
+        @Query("ts") ts: String,
+        @Query("apikey") apikey: String,
+        @Query("hash") hash: String
+    ): Response<CharactersResponse>
+
+    @GET(CHARACTER_DETAILS)
+    suspend fun characterDetails(
+        @Path("id") id: Int,
+        @Query("ts") ts: String,
+        @Query("apikey") apikey: String,
+        @Query("hash") hash: String
+    ): Response<CharactersResponse>
+}
