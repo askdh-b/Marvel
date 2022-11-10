@@ -9,24 +9,18 @@ import javax.inject.Singleton
 
 @Singleton
 interface MarvelApi {
+
     companion object {
         private const val ID = "id"
         private const val CHARACTERS = "characters"
-        private const val CHARACTER_DETAILS = "public/{$CHARACTERS}/{$ID}"
+        private const val CHARACTER_DETAILS = "$CHARACTERS/{$ID}"
+        private const val OFFSET = "offset"
     }
 
     @GET(CHARACTERS)
-    suspend fun characters(
-        @Query("ts") ts: String,
-        @Query("apikey") apikey: String,
-        @Query("hash") hash: String
-    ): Response<CharactersResponse>
+    suspend fun characters(@Query(OFFSET) offset: String): Response<CharactersResponse>
 
     @GET(CHARACTER_DETAILS)
-    suspend fun characterDetails(
-        @Path("id") id: Int,
-        @Query("ts") ts: String,
-        @Query("apikey") apikey: String,
-        @Query("hash") hash: String
-    ): Response<CharactersResponse>
+    suspend fun characterDetails(@Path(ID) id: Int): Response<CharactersResponse>
+
 }

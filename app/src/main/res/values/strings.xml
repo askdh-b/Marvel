@@ -24,6 +24,9 @@
 
     <!-- common -->
     <string name="choose_your_hero">Choose your hero</string>
+    <string name="no_characters">No characters</string>
+    <string name="no_character_details">No character details</string>
+    <string name="ok">OK</string>
 
     <!-- errors -->
     <string name="load_error">Failed to load page. Please try again later</string>

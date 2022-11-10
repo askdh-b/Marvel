@@ -23,24 +23,40 @@ class ApplicationModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(): Retrofit =
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(createClient())
-            .addConverterFactory(MoshiConverterFactory.create())
-            .build()
+    fun provideRetrofit(): Retrofit = Retrofit.Builder().baseUrl(BASE_URL).client(createClient())
+        .addConverterFactory(MoshiConverterFactory.create()).build()
 
     private fun createClient(): OkHttpClient {
         val okHttpClientBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
+
         if (BuildConfig.DEBUG) {
+
             val loggingInterceptor =
                 HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
-            okHttpClientBuilder.addInterceptor(loggingInterceptor)
+
+            okHttpClientBuilder
+                .addInterceptor(loggingInterceptor)
+                .addInterceptor { chain ->
+
+                    var request = chain.request()
+
+                    val url = request.url.newBuilder()
+                        .addQueryParameter("ts", "3600")
+                        .addQueryParameter("apikey", "c65bb38ee1ebf27e89cb7093bcfa6d9c")
+                        .addQueryParameter("hash", "8f8345d5e7ad9d9253483df2257c04e0")
+                        .build()
+
+                    request = request.newBuilder().url(url).build()
+
+                    chain.proceed(request)
+                }
         }
+
         return okHttpClientBuilder.build()
     }
-    
+
     @Singleton
     @Provides
-    fun providesHeroesRepository(heroesRepositoryImpl: HeroesRepositoryImpl): HeroesRepository = heroesRepositoryImpl
+    fun providesHeroesRepository(heroesRepositoryImpl: HeroesRepositoryImpl): HeroesRepository =
+        heroesRepositoryImpl
 }

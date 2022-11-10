@@ -6,12 +6,12 @@ import rustam.urazov.marvelapp.feature.utils.ErrorMessage
 
 sealed interface GeneralUiState : BaseUiState {
 
-    data class NoHeroes(
+    data class NoCharacters(
         override val isLoading: Boolean,
         override val errorMessages: List<ErrorMessage>
     ) : GeneralUiState
 
-    data class HasHeroes(
+    data class HasCharacters(
         val characters: List<CharacterView>,
         val visibleCharacter: CharacterView,
         val isCharacterDetailsOpen: Boolean,

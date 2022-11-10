@@ -5,9 +5,7 @@ import com.squareup.moshi.JsonClass
 import rustam.urazov.marvelapp.core.extention.empty
 
 @JsonClass(generateAdapter = true)
-data class CharactersResponse(
-    @Json(name = "data") val charactersData: CharactersData
-) {
+data class CharactersResponse(@Json(name = "data") val charactersData: CharactersData) {
 
     companion object {
         val empty = CharactersResponse(charactersData = CharactersData.emptyObject)
@@ -17,9 +15,7 @@ data class CharactersResponse(
 }
 
 @JsonClass(generateAdapter = true)
-data class CharactersData(
-    @Json(name = "results") val result: List<CharacterEntity>
-) {
+data class CharactersData(@Json(name = "results") val result: List<CharacterEntity>) {
 
     companion object {
         val emptyObject = CharactersData(result = listOf(CharacterEntity.empty))
