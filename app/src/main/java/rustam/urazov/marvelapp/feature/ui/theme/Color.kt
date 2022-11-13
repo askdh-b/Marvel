@@ -12,4 +12,5 @@ val Loki = Color(0xFFE89F30)
 val ShangChi = Color(0xFF5E0B15)
 val Daredevil = Color(0xFFA30F0F)
 val CaptainAmerica = Color(0xFFE9EDEE)
-val TextColor = Color(0xFFB8A898)
+
+val CharacterColors = listOf(SpiderMan, Loki, ShangChi, Daredevil, CaptainAmerica)

@@ -6,4 +6,5 @@ interface BaseUiState {
 
     val isLoading: Boolean
     val errorMessages: List<ErrorMessage>
+
 }
