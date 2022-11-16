@@ -4,7 +4,7 @@ import rustam.urazov.marvelapp.feature.model.CharacterView
 import rustam.urazov.marvelapp.feature.utils.ErrorMessage
 
 data class GeneralViewModelState(
-    val characters: List<rustam.urazov.marvelapp.feature.model.Character> = emptyList(),
+    val characters: List<rustam.urazov.marvelapp.feature.model.CharacterModel> = emptyList(),
     val visibleCharacterId: Int? = null,
     val isCharacterDetailsOpen: Boolean = false,
     val isLoading: Boolean = false,

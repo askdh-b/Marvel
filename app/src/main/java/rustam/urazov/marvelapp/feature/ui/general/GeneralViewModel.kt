@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.core.extention.empty
 import rustam.urazov.marvelapp.core.platform.BaseViewModel
-import rustam.urazov.marvelapp.feature.data.Either
+import rustam.urazov.marvelapp.core.platform.Either
 import rustam.urazov.marvelapp.feature.data.heroes.HeroesRepository
 import rustam.urazov.marvelapp.feature.utils.ErrorMessage
 import java.util.*
@@ -32,7 +32,7 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
     }
 
     fun loadFeed(offset: Int, isReloading: Boolean) {
-        val characters = mutableListOf<rustam.urazov.marvelapp.feature.model.Character>()
+        val characters = mutableListOf<rustam.urazov.marvelapp.feature.model.CharacterModel>()
 
         if (!isReloading) characters.addAll(viewModelState.value.characters)
 
@@ -52,7 +52,9 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
                             message = when (result.a) {
                                 is Failure.NoError -> String.empty()
                                 is Failure.ConnectionError -> "Failed to load page. Please try again later"
-                                is Failure.ServerError -> result.a.message
+                                is Failure.Error -> result.a.message
+                                Failure.NoDataError -> "Failed to load page. Please try again later"
+                                Failure.UnexpectedError -> "Failed to load page. Please try again later"
                             }
                         )
                         it.copy(errorMessages = errorMessages, isLoading = false)
@@ -91,7 +93,9 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
                             message = when (result.a) {
                                 is Failure.NoError -> String.empty()
                                 is Failure.ConnectionError -> "Failed to load page. Please try again later"
-                                is Failure.ServerError -> result.a.message
+                                is Failure.Error -> result.a.message
+                                Failure.NoDataError -> "Failed to load page. Please try again later"
+                                Failure.UnexpectedError -> "Failed to load page. Please try again later"
                             }
                         )
                         it.copy(errorMessages = errorMessages, isLoading = false)

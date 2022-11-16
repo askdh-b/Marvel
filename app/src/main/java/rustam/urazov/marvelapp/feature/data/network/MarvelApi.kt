@@ -1,9 +1,11 @@
-package rustam.urazov.marvelapp.feature.data
+package rustam.urazov.marvelapp.feature.data.network
 
-import retrofit2.Response
+import dagger.Provides
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import rustam.urazov.marvelapp.core.exception.Failure
+import rustam.urazov.marvelapp.core.platform.Either
 import rustam.urazov.marvelapp.feature.model.CharactersResponse
 import javax.inject.Singleton
 
@@ -18,9 +20,9 @@ interface MarvelApi {
     }
 
     @GET(CHARACTERS)
-    suspend fun characters(@Query(OFFSET) offset: String): Response<CharactersResponse>
+    suspend fun characters(@Query(OFFSET) offset: String): Either<Failure, CharactersResponse>
 
     @GET(CHARACTER_DETAILS)
-    suspend fun characterDetails(@Path(ID) id: Int): Response<CharactersResponse>
+    suspend fun characterDetails(@Path(ID) id: Int): Either<Failure, CharactersResponse>
 
 }

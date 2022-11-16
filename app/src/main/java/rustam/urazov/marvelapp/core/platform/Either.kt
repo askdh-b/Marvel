@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.data
+package rustam.urazov.marvelapp.core.platform
 
 sealed class Either<out L, out R> {
 
@@ -15,4 +15,11 @@ sealed class Either<out L, out R> {
 
 fun <A, B, C> ((A) -> B).compose(f: (B) -> C): (A) -> C = {
     f(this(it))
+}
+
+fun <L, R, Ro> Either<L, R>.map(
+    success: (R) -> Ro
+): Either<L, Ro> = when (this) {
+    is Either.Left -> Either.Left(this.a)
+    is Either.Right -> Either.Right(success(this.b))
 }

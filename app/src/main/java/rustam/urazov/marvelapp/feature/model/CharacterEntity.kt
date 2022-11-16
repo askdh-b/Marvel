@@ -1,67 +1,53 @@
 package rustam.urazov.marvelapp.feature.model
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import rustam.urazov.marvelapp.core.extention.empty
 
-@JsonClass(generateAdapter = true)
-data class CharactersResponse(@Json(name = "data") val charactersData: CharactersData) {
-
-    companion object {
-        val empty = CharactersResponse(charactersData = CharactersData.emptyObject)
-        val emptyList = CharactersResponse(charactersData = CharactersData.emptyList)
-    }
-
-}
-
-@JsonClass(generateAdapter = true)
-data class CharactersData(@Json(name = "results") val result: List<CharacterEntity>) {
-
-    companion object {
-        val emptyObject = CharactersData(result = listOf(CharacterEntity.empty))
-        val emptyList = CharactersData(result = emptyList())
-    }
-
-}
-
-@JsonClass(generateAdapter = true)
+@Entity(tableName = "Character")
 data class CharacterEntity(
-    @Json(name = "id") val id: Int,
-    @Json(name = "name") val name: String,
-    @Json(name = "description") val description: String,
-    @Json(name = "thumbnail") val thumbnail: Thumbnail,
-    @Json(name = "resourceURI") val resourceURI: String
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "characterId") val id: Int = 0,
+    @ColumnInfo(name = "chId") val chId: Int = 0,
+    @ColumnInfo(name = "name") val name: String = String.empty(),
+    @ColumnInfo(name = "description") val description: String = String.empty(),
+    @ColumnInfo(name = "thumbnail", typeAffinity = ColumnInfo.BLOB) val thumbnail: ByteArray = ByteArray(0)
 ) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-    companion object {
-        val empty = CharacterEntity(
-            id = 0,
-            name = String.empty(),
-            description = String.empty(),
-            thumbnail = Thumbnail.empty,
-            resourceURI = String.empty()
-        )
+        other as CharacterEntity
+
+        if (id != other.id) return false
+        if (chId != other.chId) return false
+        if (name != other.name) return false
+        if (description != other.description) return false
+        if (!thumbnail.contentEquals(other.thumbnail)) return false
+
+        return true
     }
 
-    fun toCharacter(): Character =
-        Character(
-            id = id,
-            name = name,
-            description = description,
-            thumbnail = thumbnail.toImageUri(),
-            resourceURI = resourceURI
-        )
-}
-
-@JsonClass(generateAdapter = true)
-data class Thumbnail(
-    @Json(name = "path") val path: String,
-    @Json(name = "extension") val extension: String
-) {
-
-    companion object {
-        val empty = Thumbnail(path = String.empty(), extension = String.empty())
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + name.hashCode()
+        result = 31 * result + description.hashCode()
+        result = 31 * result + thumbnail.contentHashCode()
+        return result
     }
 
-    fun toImageUri(): String = "${path}.${extension}"
+    fun toCharacter() = CharacterModel(
+        id = chId,
+        name = name,
+        description = description,
+        thumbnail = toBitmap(thumbnail)
+    )
+
+    private fun toBitmap(image: ByteArray): Bitmap? =
+        when (image.isEmpty()) {
+            true -> null
+            false -> BitmapFactory.decodeByteArray(image, 0, image.size)
+        }
 }

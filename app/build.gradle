@@ -22,6 +22,11 @@ android {
         }
     }
 
+    lint {
+        disable "JvmStaticProvidesInObjectDetector", "FieldSiteTargetOnQualifierAnnotation", "ModuleCompanionObjects", "ModuleCompanionObjectsNotInModuleParent"
+        baseline = file("lint-baseline.xml")
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -39,7 +44,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.1.1'
+        kotlinCompilerExtensionVersion '1.3.1'
     }
     packagingOptions {
         resources {
@@ -49,6 +54,15 @@ android {
 }
 
 dependencies {
+
+    // ksp
+    implementation("com.google.devtools.ksp:symbol-processing-api:1.7.20-1.0.7")
+
+    // room
+    implementation "androidx.room:room-runtime:2.4.3"
+    implementation "androidx.room:room-ktx:2.4.3"
+    annotationProcessor "androidx.room:room-compiler:2.4.3"
+    kapt "androidx.room:room-compiler:2.4.3"
 
     // moshi
     implementation "com.squareup.moshi:moshi:1.14.0"
