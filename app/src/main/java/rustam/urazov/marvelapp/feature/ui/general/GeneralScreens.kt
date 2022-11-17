@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.*
 import rustam.urazov.marvelapp.R
-import rustam.urazov.marvelapp.feature.model.CharacterView
 import rustam.urazov.marvelapp.feature.ui.theme.Background
 import rustam.urazov.marvelapp.feature.ui.theme.CharacterColors
 

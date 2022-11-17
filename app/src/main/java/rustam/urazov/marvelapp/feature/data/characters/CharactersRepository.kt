@@ -1,10 +1,9 @@
-package rustam.urazov.marvelapp.feature.data.heroes
+package rustam.urazov.marvelapp.feature.data.characters
 
 import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.core.platform.Either
-import rustam.urazov.marvelapp.feature.model.CharacterModel
 
-interface HeroesRepository {
+interface CharactersRepository {
 
     suspend fun getCharacterDetails(characterId: Int): Either<Failure, CharacterModel>
 

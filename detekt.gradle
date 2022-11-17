@@ -29,9 +29,5 @@ tasks.named("detekt").configure {
         sarif.outputLocation.set(file("build/reports/detekt.sarif"))
         md.required.set(true)
         md.outputLocation.set(file("build/reports/detekt.md"))
-        custom {
-            reportId = "CustomJsonReport"
-            outputLocation.set(file("build/reports/detekt.json"))
-        }
     }
 }

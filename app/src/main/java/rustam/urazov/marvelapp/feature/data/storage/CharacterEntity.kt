@@ -1,7 +1,5 @@
-package rustam.urazov.marvelapp.feature.model
+package rustam.urazov.marvelapp.feature.data.storage
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -38,16 +36,4 @@ data class CharacterEntity(
         return result
     }
 
-    fun toCharacter() = CharacterModel(
-        id = chId,
-        name = name,
-        description = description,
-        thumbnail = toBitmap(thumbnail)
-    )
-
-    private fun toBitmap(image: ByteArray): Bitmap? =
-        when (image.isEmpty()) {
-            true -> null
-            false -> BitmapFactory.decodeByteArray(image, 0, image.size)
-        }
 }

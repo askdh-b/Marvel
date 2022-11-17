@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import rustam.urazov.marvelapp.feature.model.CharacterView
 import rustam.urazov.marvelapp.feature.ui.ErrorDialog
 import rustam.urazov.marvelapp.feature.ui.theme.Background
 import rustam.urazov.marvelapp.feature.utils.RefreshProgressBarState

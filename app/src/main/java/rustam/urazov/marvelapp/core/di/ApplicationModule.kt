@@ -11,13 +11,13 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import rustam.urazov.marvelapp.feature.data.network.MarvelCallAdapterFactory
-import rustam.urazov.marvelapp.feature.data.heroes.HeroesRepository
-import rustam.urazov.marvelapp.feature.data.heroes.impl.HeroesRepositoryImpl
-import rustam.urazov.marvelapp.feature.data.network.MarvelApi
-import rustam.urazov.marvelapp.feature.data.network.MarvelService
+import rustam.urazov.marvelapp.core.platform.NetworkHandler
+import rustam.urazov.marvelapp.core.platform.NetworkHandlerImpl
+import rustam.urazov.marvelapp.feature.data.characters.CharactersRepository
+import rustam.urazov.marvelapp.feature.data.characters.impl.CharactersRepositoryImpl
+import rustam.urazov.marvelapp.feature.data.network.*
 import rustam.urazov.marvelapp.feature.data.storage.CharactersDatabase
-import rustam.urazov.marvelapp.feature.model.CharacterEntity
+import rustam.urazov.marvelapp.feature.data.storage.CharacterEntity
 import java.math.BigInteger
 import java.security.MessageDigest
 import javax.inject.Singleton
@@ -73,8 +73,20 @@ class ApplicationModule {
 
     @Singleton
     @Provides
-    fun providesHeroesRepository(heroesRepositoryImpl: HeroesRepositoryImpl): HeroesRepository =
-        heroesRepositoryImpl
+    fun provideHeroesRepository(charactersRepositoryImpl: CharactersRepositoryImpl): CharactersRepository =
+        charactersRepositoryImpl
+
+    @Singleton
+    @Provides
+    fun provideImageLoader(imageLoader: ImageLoaderImpl): ImageLoader = imageLoader
+
+    @Singleton
+    @Provides
+    fun provideApiService(service: MarvelService): MarvelApi = service
+
+    @Singleton
+    @Provides
+    fun provideNetworkHandler(networkHandler: NetworkHandlerImpl): NetworkHandler = networkHandler
 
     private fun md5(input: String): String {
         val md = MessageDigest.getInstance("MD5")

@@ -1,12 +1,10 @@
 package rustam.urazov.marvelapp.feature.data.network
 
-import dagger.Provides
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.core.platform.Either
-import rustam.urazov.marvelapp.feature.model.CharactersResponse
 import javax.inject.Singleton
 
 @Singleton

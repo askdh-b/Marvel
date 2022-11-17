@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.model
+package rustam.urazov.marvelapp.feature.ui.general
 
 import android.graphics.Bitmap
 import rustam.urazov.marvelapp.core.extention.empty

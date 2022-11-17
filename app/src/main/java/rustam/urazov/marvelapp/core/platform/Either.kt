@@ -17,8 +17,8 @@ fun <A, B, C> ((A) -> B).compose(f: (B) -> C): (A) -> C = {
     f(this(it))
 }
 
-fun <L, R, Ro> Either<L, R>.map(
-    success: (R) -> Ro
+suspend fun <L, R, Ro> Either<L, R>.map(
+    success: suspend (R) -> Ro
 ): Either<L, Ro> = when (this) {
     is Either.Left -> Either.Left(this.a)
     is Either.Right -> Either.Right(success(this.b))

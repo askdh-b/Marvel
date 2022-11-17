@@ -1,6 +1,8 @@
-package rustam.urazov.marvelapp.feature.model
+package rustam.urazov.marvelapp.feature.data.characters
 
 import android.graphics.Bitmap
+import rustam.urazov.marvelapp.feature.data.storage.CharacterEntity
+import rustam.urazov.marvelapp.feature.ui.general.CharacterView
 import java.io.ByteArrayOutputStream
 
 data class CharacterModel(

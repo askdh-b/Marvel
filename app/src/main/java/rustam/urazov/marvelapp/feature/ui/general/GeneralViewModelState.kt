@@ -1,10 +1,10 @@
 package rustam.urazov.marvelapp.feature.ui.general
 
-import rustam.urazov.marvelapp.feature.model.CharacterView
+import rustam.urazov.marvelapp.feature.data.characters.CharacterModel
 import rustam.urazov.marvelapp.feature.utils.ErrorMessage
 
 data class GeneralViewModelState(
-    val characters: List<rustam.urazov.marvelapp.feature.model.CharacterModel> = emptyList(),
+    val characters: List<CharacterModel> = emptyList(),
     val visibleCharacterId: Int? = null,
     val isCharacterDetailsOpen: Boolean = false,
     val isLoading: Boolean = false,
