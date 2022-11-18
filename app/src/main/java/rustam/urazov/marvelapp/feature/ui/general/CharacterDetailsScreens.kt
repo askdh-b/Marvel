@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import rustam.urazov.marvelapp.R
-import rustam.urazov.marvelapp.feature.model.CharacterView
 
 @Composable
 fun CharacterDetailsScreen(

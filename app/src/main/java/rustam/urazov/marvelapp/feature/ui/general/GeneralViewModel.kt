@@ -7,14 +7,15 @@ import kotlinx.coroutines.launch
 import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.core.extention.empty
 import rustam.urazov.marvelapp.core.platform.BaseViewModel
-import rustam.urazov.marvelapp.feature.data.Either
-import rustam.urazov.marvelapp.feature.data.heroes.HeroesRepository
+import rustam.urazov.marvelapp.core.platform.Either
+import rustam.urazov.marvelapp.feature.data.characters.CharacterModel
+import rustam.urazov.marvelapp.feature.data.characters.CharactersRepository
 import rustam.urazov.marvelapp.feature.utils.ErrorMessage
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesRepository) :
+class GeneralViewModel @Inject constructor(private val charactersRepository: CharactersRepository) :
     BaseViewModel() {
 
     private val viewModelState = MutableStateFlow(GeneralViewModelState(isLoading = true))
@@ -32,14 +33,14 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
     }
 
     fun loadFeed(offset: Int, isReloading: Boolean) {
-        val characters = mutableListOf<rustam.urazov.marvelapp.feature.model.Character>()
+        val characters = mutableListOf<CharacterModel>()
 
         if (!isReloading) characters.addAll(viewModelState.value.characters)
 
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = heroesRepository.getCharacters(offset)
+            val result = charactersRepository.getCharacters(offset)
             viewModelState.update {
                 when (result) {
                     is Either.Right -> {
@@ -52,7 +53,9 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
                             message = when (result.a) {
                                 is Failure.NoError -> String.empty()
                                 is Failure.ConnectionError -> "Failed to load page. Please try again later"
-                                is Failure.ServerError -> result.a.message
+                                is Failure.Error -> result.a.message
+                                Failure.NoDataError -> "Failed to load page. Please try again later"
+                                Failure.UnexpectedError -> "Failed to load page. Please try again later"
                             }
                         )
                         it.copy(errorMessages = errorMessages, isLoading = false)
@@ -77,7 +80,7 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
         viewModelState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = heroesRepository.getCharacterDetails(selectedCharacter)
+            val result = charactersRepository.getCharacterDetails(selectedCharacter)
             viewModelState.update {
                 when (result) {
                     is Either.Right -> it.copy(
@@ -91,7 +94,9 @@ class GeneralViewModel @Inject constructor(private val heroesRepository: HeroesR
                             message = when (result.a) {
                                 is Failure.NoError -> String.empty()
                                 is Failure.ConnectionError -> "Failed to load page. Please try again later"
-                                is Failure.ServerError -> result.a.message
+                                is Failure.Error -> result.a.message
+                                Failure.NoDataError -> "Failed to load page. Please try again later"
+                                Failure.UnexpectedError -> "Failed to load page. Please try again later"
                             }
                         )
                         it.copy(errorMessages = errorMessages, isLoading = false)
