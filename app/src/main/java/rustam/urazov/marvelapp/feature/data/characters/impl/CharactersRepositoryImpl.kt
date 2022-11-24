@@ -22,7 +22,7 @@ class CharactersRepositoryImpl @Inject constructor(
     private val imageLoader: ImageLoader
 ) : CharactersRepository {
 
-    override suspend fun getCharacterDetails(characterId: Int): Either<Failure, CharacterModel> =
+    override suspend fun getCharacterDetails(characterId: Int): Either<Failure, CharacterModel> = try {
         when (networkHandler.isNetworkAvailable()) {
             true -> {
                 val result = networkService.characterDetails(characterId)
@@ -34,8 +34,11 @@ class CharactersRepositoryImpl @Inject constructor(
             }
             false -> Either.Right(toCharacter(getCharacterFromDataStore(characterId)))
         }
+    } catch (e: Exception) {
+        Either.Left(Failure.NoDataError)
+    }
 
-    override suspend fun getCharacters(offset: Int): Either<Failure, List<CharacterModel>> =
+    override suspend fun getCharacters(offset: Int): Either<Failure, List<CharacterModel>> = try {
         when (networkHandler.isNetworkAvailable()) {
             true -> {
                 val result = networkService.characters(offset.toString())
@@ -45,11 +48,27 @@ class CharactersRepositoryImpl @Inject constructor(
                         saveCharacters((result as Either.Right).b.map { it.toCharacterEntity() })
                         result
                     }
-                    false -> Either.Right(getCharactersFromDataStore(offset).map { toCharacter(it) })
+                    false -> {
+                        val characters = getCharactersFromDataStore(offset)
+                        when (characters.isEmpty()) {
+                            true -> Either.Left(Failure.NoDataError)
+                            false -> Either.Right(characters.map { toCharacter(it) })
+                        }
+                    }
                 }
             }
-            false -> Either.Right(getCharactersFromDataStore(offset).map { toCharacter(it) })
+            false -> {
+                val characters = getCharactersFromDataStore(offset)
+                when (characters.isEmpty()) {
+                    true -> Either.Left(Failure.NoDataError)
+                    false -> Either.Right(characters.map { toCharacter(it) })
+                }
+            }
         }
+    } catch (e: Exception) {
+        Either.Left(Failure.NoDataError)
+    }
+
 
     private suspend fun getCharacterFromDataStore(characterId: Int): CharacterEntity =
         storageService.getCharacter(characterId)
@@ -76,10 +95,12 @@ class CharactersRepositoryImpl @Inject constructor(
             id = characterResponse.id,
             name = characterResponse.name,
             description = characterResponse.description,
-            thumbnail = imageLoader.loadImage(characterResponse.thumbnail.toImageUri())
+            thumbnail = imageLoad(characterResponse.thumbnail.toImageUri())
         )
 
-    private fun toCharacter(characterEntity: CharacterEntity) = CharacterModel(
+    private suspend fun imageLoad(url: String): Bitmap? = imageLoader.loadImage(url)
+
+    private fun toCharacter(characterEntity: CharacterEntity): CharacterModel = CharacterModel(
         id = characterEntity.chId,
         name = characterEntity.name,
         description = characterEntity.description,

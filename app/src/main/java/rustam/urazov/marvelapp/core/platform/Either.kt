@@ -13,10 +13,6 @@ sealed class Either<out L, out R> {
     fun <R> right(b: R) = Right(b)
 }
 
-fun <A, B, C> ((A) -> B).compose(f: (B) -> C): (A) -> C = {
-    f(this(it))
-}
-
 suspend fun <L, R, Ro> Either<L, R>.map(
     success: suspend (R) -> Ro
 ): Either<L, Ro> = when (this) {

@@ -4,118 +4,113 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import rustam.urazov.marvelapp.core.exception.Failure
-import rustam.urazov.marvelapp.core.extention.empty
 import rustam.urazov.marvelapp.core.platform.BaseViewModel
 import rustam.urazov.marvelapp.core.platform.Either
-import rustam.urazov.marvelapp.feature.data.characters.CharacterModel
+import rustam.urazov.marvelapp.core.platform.Reducer
 import rustam.urazov.marvelapp.feature.data.characters.CharactersRepository
-import rustam.urazov.marvelapp.feature.utils.ErrorMessage
-import java.util.*
+import rustam.urazov.marvelapp.feature.ui.ErrorDialogEvent
 import javax.inject.Inject
 
 @HiltViewModel
 class GeneralViewModel @Inject constructor(private val charactersRepository: CharactersRepository) :
-    BaseViewModel() {
+    BaseViewModel<GeneralUiState, GeneralScreenUiEvent>() {
 
-    private val viewModelState = MutableStateFlow(GeneralViewModelState(isLoading = true))
+    private val reducer = GeneralReducer(GeneralUiState.Loading)
 
-    val uiState = viewModelState
-        .map { it.toUiState() }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            viewModelState.value.toUiState()
-        )
+    override val state: StateFlow<GeneralUiState>
+        get() = reducer.state
 
     init {
-        loadFeed(offset = 0, isReloading = false)
+        load()
     }
 
-    fun loadFeed(offset: Int, isReloading: Boolean) {
-        val characters = mutableListOf<CharacterModel>()
-
-        if (!isReloading) characters.addAll(viewModelState.value.characters)
-
-        viewModelState.update { it.copy(isLoading = true) }
-
+    private fun loadFeed(offset: Int) {
         viewModelScope.launch {
-            val result = charactersRepository.getCharacters(offset)
-            viewModelState.update {
-                when (result) {
-                    is Either.Right -> {
-                        characters.addAll(result.b)
-                        it.copy(characters = characters, isLoading = false)
-                    }
-                    is Either.Left -> {
-                        val errorMessages = it.errorMessages + ErrorMessage(
-                            id = UUID.randomUUID().mostSignificantBits,
-                            message = when (result.a) {
-                                is Failure.NoError -> String.empty()
-                                is Failure.ConnectionError -> "Failed to load page. Please try again later"
-                                is Failure.Error -> result.a.message
-                                Failure.NoDataError -> "Failed to load page. Please try again later"
-                                Failure.UnexpectedError -> "Failed to load page. Please try again later"
-                            }
-                        )
-                        it.copy(errorMessages = errorMessages, isLoading = false)
-                    }
+            when (val result = charactersRepository.getCharacters(offset)) {
+                is Either.Right -> sendEvent(GeneralScreenUiEvent.AddCharacters(result.b.map { it.toCharacterView() }))
+                is Either.Left -> {
+                    sendEvent(GeneralScreenUiEvent.HideCharactersList)
+                    sendEvent(ErrorDialogEvent.Open(result.a))
                 }
             }
         }
     }
 
     fun changeVisibleHero(visibleCharacterId: Int) {
-        viewModelState.update {
-            val characters = it.characters
-            it.copy(
-                characters = characters,
-                visibleCharacterId = visibleCharacterId,
-                isLoading = false
-            )
-        }
+        sendEvent(GeneralScreenUiEvent.ChangeVisibleCharacter(visibleCharacterId))
     }
 
-    fun heroDetailsOpen(selectedCharacter: Int) {
-        viewModelState.update { it.copy(isLoading = true) }
-
+    private fun loadCharacterDetails(selectedCharacter: Int) {
         viewModelScope.launch {
-            val result = charactersRepository.getCharacterDetails(selectedCharacter)
-            viewModelState.update {
-                when (result) {
-                    is Either.Right -> it.copy(
-                        visibleCharacterId = selectedCharacter,
-                        isCharacterDetailsOpen = true,
-                        isLoading = false
-                    )
-                    is Either.Left -> {
-                        val errorMessages = it.errorMessages + ErrorMessage(
-                            id = UUID.randomUUID().mostSignificantBits,
-                            message = when (result.a) {
-                                is Failure.NoError -> String.empty()
-                                is Failure.ConnectionError -> "Failed to load page. Please try again later"
-                                is Failure.Error -> result.a.message
-                                Failure.NoDataError -> "Failed to load page. Please try again later"
-                                Failure.UnexpectedError -> "Failed to load page. Please try again later"
-                            }
-                        )
-                        it.copy(errorMessages = errorMessages, isLoading = false)
-                    }
+            when (val result = charactersRepository.getCharacterDetails(selectedCharacter)) {
+                is Either.Right -> sendEvent(GeneralScreenUiEvent.ShowCharacterDetails(result.b.toCharacterView()))
+                is Either.Left -> {
+                    sendEvent(GeneralScreenUiEvent.HideCharactersList)
+                    sendEvent(ErrorDialogEvent.Open(result.a))
                 }
             }
         }
     }
 
-    fun heroDetailsClose() {
-        viewModelState.update {
-            it.copy(isCharacterDetailsOpen = false)
-        }
+    fun characterDetailsOpen(characterId: Int) {
+        sendEvent(GeneralScreenUiEvent.LoadCharacterDetails)
+        loadCharacterDetails(characterId)
     }
 
-    fun errorShown(errorId: Long) {
-        viewModelState.update { currentUiState ->
-            val errorMessages = currentUiState.errorMessages.filterNot { it.id == errorId }
-            currentUiState.copy(errorMessages = errorMessages)
-        }
+    fun characterDetailsClose() = sendEvent(GeneralScreenUiEvent.CloseCharacterDetails)
+
+    fun load() {
+        sendEvent(GeneralScreenUiEvent.LoadCharacters)
+        loadFeed(0)
     }
+
+    fun load(offset: Int) = loadFeed(offset)
+
+    private fun sendEvent(event: GeneralScreenUiEvent) = reducer.sendEvent(event)
+
+    private class GeneralReducer(initial: GeneralUiState) :
+        Reducer<GeneralUiState, GeneralScreenUiEvent>(initial) {
+
+        override fun reduce(oldState: GeneralUiState, event: GeneralScreenUiEvent) {
+            when (event) {
+                GeneralScreenUiEvent.LoadCharacters -> setState(GeneralUiState.Loading)
+                is GeneralScreenUiEvent.ChangeVisibleCharacter -> setState(
+                    (oldState as GeneralUiState.HasCharacters).copy(
+                        visibleCharacter = oldState.characters.find { it.id == event.characterId }
+                            ?: oldState.characters.first())
+                )
+                is GeneralScreenUiEvent.ShowCharacterDetails -> setState(
+                    (oldState as GeneralUiState.HasCharacters).copy(
+                        characterDetailsUiState = CharacterDetailsUiState.Open(oldState.visibleCharacter)
+                    )
+                )
+                GeneralScreenUiEvent.CloseCharacterDetails -> setState(
+                    (oldState as GeneralUiState.HasCharacters).copy(
+                        characterDetailsUiState = CharacterDetailsUiState.Closed
+                    )
+                )
+                GeneralScreenUiEvent.LoadCharacterDetails -> setState(
+                    (oldState as GeneralUiState.HasCharacters).copy(
+                        characterDetailsUiState = CharacterDetailsUiState.Loading
+                    )
+                )
+                is GeneralScreenUiEvent.AddCharacters -> {
+                    val characters: MutableList<CharacterView> = mutableListOf()
+                    if (oldState is GeneralUiState.HasCharacters) characters.addAll(oldState.characters)
+                    characters.addAll(event.characters)
+
+                    setState(
+                        GeneralUiState.HasCharacters(
+                            characters = characters,
+                            visibleCharacter = characters.first(),
+                            characterDetailsUiState = CharacterDetailsUiState.Closed
+                        )
+                    )
+                }
+                GeneralScreenUiEvent.HideCharactersList -> setState(GeneralUiState.NoCharacters)
+            }
+        }
+
+    }
+
 }

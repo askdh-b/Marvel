@@ -34,14 +34,14 @@ fun GeneralScreenWithCharacters(
     charactersLazyListState: LazyListState,
     onChangeVisibleCharacter: (Int) -> Unit,
     onCharacterClick: (Int) -> Unit,
-    onMoreLoad: (Int, Boolean) -> Unit,
+    onLoad: () -> Unit,
+    onMoreLoad: (Int) -> Unit,
 ) {
     check(uiState is GeneralUiState.HasCharacters)
 
     Column(modifier = Modifier.fillMaxSize()) {
         Logo()
         Content(
-            isLoading = uiState.isLoading,
             characters = uiState.characters,
             charactersLazyListState = charactersLazyListState,
             onChangeVisibleCharacter = onChangeVisibleCharacter,
@@ -109,21 +109,19 @@ fun CentralProgressIndicator() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Content(
-    isLoading: Boolean,
     characters: List<CharacterView>,
     charactersLazyListState: LazyListState,
     onChangeVisibleCharacter: (Int) -> Unit,
     onCharacterClick: (Int) -> Unit,
-    onMoreLoad: (Int, Boolean) -> Unit,
+    onMoreLoad: (Int) -> Unit,
 ) {
     val firstVisibleCharacterIndex =
         remember { derivedStateOf { charactersLazyListState.firstVisibleItemIndex } }.value
 
     onChangeVisibleCharacter.invoke(characters[firstVisibleCharacterIndex].id)
 
-    if (firstVisibleCharacterIndex == characters.lastIndex && !isLoading) onMoreLoad.invoke(
-        firstVisibleCharacterIndex + 1,
-        false
+    if (firstVisibleCharacterIndex == characters.lastIndex) onMoreLoad.invoke(
+        firstVisibleCharacterIndex + 1
     )
 
     Surface(color = Background) {

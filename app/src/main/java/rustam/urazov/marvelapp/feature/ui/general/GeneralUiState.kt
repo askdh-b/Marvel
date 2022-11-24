@@ -1,20 +1,21 @@
 package rustam.urazov.marvelapp.feature.ui.general
 
-import rustam.urazov.marvelapp.core.platform.BaseUiState
+import rustam.urazov.marvelapp.core.platform.UiState
 import rustam.urazov.marvelapp.feature.utils.ErrorMessage
 
-sealed interface GeneralUiState : BaseUiState {
-
-    data class NoCharacters(
-        override val isLoading: Boolean,
-        override val errorMessages: List<ErrorMessage>
-    ) : GeneralUiState
-
+sealed interface GeneralUiState : UiState {
+    object Loading : GeneralUiState
+    object NoCharacters : GeneralUiState
     data class HasCharacters(
         val characters: List<CharacterView>,
         val visibleCharacter: CharacterView,
-        val isCharacterDetailsOpen: Boolean,
-        override val isLoading: Boolean,
-        override val errorMessages: List<ErrorMessage>
+        val characterDetailsUiState: CharacterDetailsUiState
     ) : GeneralUiState
+}
+
+sealed interface CharacterDetailsUiState : UiState {
+    object Loading : CharacterDetailsUiState
+    object Closed : CharacterDetailsUiState
+    object NoData : CharacterDetailsUiState
+    data class Open(val character: CharacterView) : CharacterDetailsUiState
 }
