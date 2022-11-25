@@ -1,5 +1,7 @@
 package rustam.urazov.marvelapp.feature.ui.general
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import rustam.urazov.marvelapp.R
+import rustam.urazov.marvelapp.feature.ui.theme.Background
 
 @Composable
 fun CharacterDetailsScreen(
@@ -29,22 +32,26 @@ fun CharacterDetailsScreen(
         CharacterDetails(character)
         ArrowBack(onBackClick)
     }
+
+    BackHandler { onBackClick.invoke() }
 }
 
 @Composable
 fun CharacterDetailsLoadingScreen(onBackClick: () -> Unit) {
     Surface {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().background(Background)) {
             CentralProgressIndicator()
         }
         ArrowBack(onBackClick)
     }
+
+    BackHandler { onBackClick.invoke() }
 }
 
 @Composable
 fun CharacterDetailsScreenWithoutContent(onBackClick: () -> Unit) {
     Surface {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().background(Background)) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(id = R.string.no_character_details),
@@ -56,6 +63,8 @@ fun CharacterDetailsScreenWithoutContent(onBackClick: () -> Unit) {
         }
         ArrowBack(onBackClick)
     }
+
+    BackHandler { onBackClick.invoke() }
 }
 
 @Composable

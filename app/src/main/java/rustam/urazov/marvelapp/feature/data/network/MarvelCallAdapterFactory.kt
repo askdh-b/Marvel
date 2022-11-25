@@ -8,9 +8,8 @@ import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.core.platform.Either
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import javax.inject.Inject
 
-class MarvelCallAdapterFactory @Inject constructor() : CallAdapter.Factory() {
+class MarvelCallAdapterFactory : CallAdapter.Factory() {
 
     override fun get(
         returnType: Type,

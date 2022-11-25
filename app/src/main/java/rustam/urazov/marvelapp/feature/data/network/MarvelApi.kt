@@ -5,9 +5,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.core.platform.Either
-import javax.inject.Singleton
 
-@Singleton
 interface MarvelApi {
 
     companion object {
