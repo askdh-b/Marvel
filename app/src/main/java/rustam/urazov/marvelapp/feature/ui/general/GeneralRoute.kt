@@ -6,24 +6,24 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import rustam.urazov.marvelapp.feature.ui.ErrorDialog
 import rustam.urazov.marvelapp.feature.ui.ErrorDialogState
+import rustam.urazov.marvelapp.feature.ui.MarvelDestinations
 import rustam.urazov.marvelapp.feature.ui.theme.Background
 
 @Composable
 fun GeneralRoute(
     generalViewModel: GeneralViewModel,
+    navController: NavController
 ) {
     val uiState by generalViewModel.state.collectAsState()
     val dialogState by generalViewModel.dialogState.collectAsState()
-
     GeneralRoute(
         uiState = uiState,
         dialogState = dialogState,
         onChangeVisibleHero = { generalViewModel.changeVisibleHero(it) },
-        onHeroClick = { generalViewModel.characterDetailsOpen(it) },
-        onBackClick = { generalViewModel.characterDetailsClose() },
-        onLoad = { generalViewModel.load() },
+        onHeroClick = { navController.navigate("${MarvelDestinations.CHARACTER_DETAILS_ROUTE}/${it}") },
         onMoreLoad = { generalViewModel.load(it) },
         onErrorDismiss = { generalViewModel.closeDialog() }
     )
@@ -35,8 +35,6 @@ private fun GeneralRoute(
     dialogState: ErrorDialogState,
     onChangeVisibleHero: (Int) -> Unit,
     onHeroClick: (Int) -> Unit,
-    onBackClick: () -> Unit,
-    onLoad: () -> Unit,
     onMoreLoad: (Int) -> Unit,
     onErrorDismiss: () -> Unit,
 ) {
@@ -53,8 +51,6 @@ private fun GeneralRoute(
                 charactersLazyListState = generalListLazyListState,
                 onChangeVisibleHero = onChangeVisibleHero,
                 onHeroClick = onHeroClick,
-                onBackClick = onBackClick,
-                onLoad = onLoad,
                 onMoreLoad = onMoreLoad,
                 onErrorDismiss = onErrorDismiss,
             )
@@ -69,26 +65,18 @@ private fun GeneralRoute(
     charactersLazyListState: LazyListState,
     onChangeVisibleHero: (Int) -> Unit,
     onHeroClick: (Int) -> Unit,
-    onBackClick: () -> Unit,
-    onLoad: () -> Unit,
     onMoreLoad: (Int) -> Unit,
     onErrorDismiss: () -> Unit,
 ) {
     when (uiState) {
         is GeneralUiState.HasCharacters -> {
-            when (uiState.characterDetailsUiState) {
-                CharacterDetailsUiState.Closed -> GeneralScreenWithCharacters(
-                    uiState = uiState,
-                    charactersLazyListState = charactersLazyListState,
-                    onChangeVisibleCharacter = onChangeVisibleHero,
-                    onCharacterClick = onHeroClick,
-                    onLoad = onLoad,
-                    onMoreLoad = onMoreLoad
-                )
-                CharacterDetailsUiState.Loading -> CharacterDetailsLoadingScreen(onBackClick)
-                CharacterDetailsUiState.NoData -> CharacterDetailsScreenWithoutContent(onBackClick)
-                is CharacterDetailsUiState.Open -> CharacterDetailsScreen(character = uiState.visibleCharacter, onBackClick)
-            }
+            GeneralScreenWithCharacters(
+                uiState = uiState,
+                charactersLazyListState = charactersLazyListState,
+                onChangeVisibleCharacter = onChangeVisibleHero,
+                onCharacterClick = onHeroClick,
+                onMoreLoad = onMoreLoad
+            )
         }
         GeneralUiState.Loading -> GeneralLoadingScreen()
         GeneralUiState.NoCharacters -> GeneralScreenWithoutCharacters()

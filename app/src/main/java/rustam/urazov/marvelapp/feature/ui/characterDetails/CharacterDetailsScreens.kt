@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.ui.general
+package rustam.urazov.marvelapp.feature.ui.characterDetails
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import rustam.urazov.marvelapp.R
+import rustam.urazov.marvelapp.feature.ui.general.CentralProgressIndicator
+import rustam.urazov.marvelapp.feature.ui.general.CharacterView
 import rustam.urazov.marvelapp.feature.ui.theme.Background
 
 @Composable
@@ -37,9 +39,15 @@ fun CharacterDetailsScreen(
 }
 
 @Composable
-fun CharacterDetailsLoadingScreen(onBackClick: () -> Unit) {
+fun CharacterDetailsLoadingScreen(
+    onLoad: () -> Unit,
+    onBackClick: () -> Unit,
+) {
+    onLoad.invoke()
     Surface {
-        Column(modifier = Modifier.fillMaxSize().background(Background)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(Background)) {
             CentralProgressIndicator()
         }
         ArrowBack(onBackClick)
@@ -51,7 +59,9 @@ fun CharacterDetailsLoadingScreen(onBackClick: () -> Unit) {
 @Composable
 fun CharacterDetailsScreenWithoutContent(onBackClick: () -> Unit) {
     Surface {
-        Box(modifier = Modifier.fillMaxSize().background(Background)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Background)) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(id = R.string.no_character_details),

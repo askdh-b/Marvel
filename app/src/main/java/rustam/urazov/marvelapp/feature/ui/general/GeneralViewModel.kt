@@ -36,30 +36,11 @@ class GeneralViewModel @Inject constructor(private val charactersRepository: Cha
         }
     }
 
-    fun changeVisibleHero(visibleCharacterId: Int) {
+    fun changeVisibleHero(visibleCharacterId: Int) =
         sendEvent(GeneralScreenUiEvent.ChangeVisibleCharacter(visibleCharacterId))
-    }
 
-    private fun loadCharacterDetails(selectedCharacter: Int) {
-        viewModelScope.launch {
-            when (val result = charactersRepository.getCharacterDetails(selectedCharacter)) {
-                is Either.Right -> sendEvent(GeneralScreenUiEvent.ShowCharacterDetails(result.b.toCharacterView()))
-                is Either.Left -> {
-                    sendEvent(GeneralScreenUiEvent.HideCharactersList)
-                    sendEvent(ErrorDialogEvent.Open(result.a))
-                }
-            }
-        }
-    }
 
-    fun characterDetailsOpen(characterId: Int) {
-        sendEvent(GeneralScreenUiEvent.LoadCharacterDetails)
-        loadCharacterDetails(characterId)
-    }
-
-    fun characterDetailsClose() = sendEvent(GeneralScreenUiEvent.CloseCharacterDetails)
-
-    fun load() {
+    private fun load() {
         sendEvent(GeneralScreenUiEvent.LoadCharacters)
         loadFeed(0)
     }
@@ -79,21 +60,6 @@ class GeneralViewModel @Inject constructor(private val charactersRepository: Cha
                         visibleCharacter = oldState.characters.find { it.id == event.characterId }
                             ?: oldState.characters.first())
                 )
-                is GeneralScreenUiEvent.ShowCharacterDetails -> setState(
-                    (oldState as GeneralUiState.HasCharacters).copy(
-                        characterDetailsUiState = CharacterDetailsUiState.Open(oldState.visibleCharacter)
-                    )
-                )
-                GeneralScreenUiEvent.CloseCharacterDetails -> setState(
-                    (oldState as GeneralUiState.HasCharacters).copy(
-                        characterDetailsUiState = CharacterDetailsUiState.Closed
-                    )
-                )
-                GeneralScreenUiEvent.LoadCharacterDetails -> setState(
-                    (oldState as GeneralUiState.HasCharacters).copy(
-                        characterDetailsUiState = CharacterDetailsUiState.Loading
-                    )
-                )
                 is GeneralScreenUiEvent.AddCharacters -> {
                     val characters: MutableList<CharacterView> = mutableListOf()
                     if (oldState is GeneralUiState.HasCharacters) characters.addAll(oldState.characters)
@@ -102,8 +68,7 @@ class GeneralViewModel @Inject constructor(private val charactersRepository: Cha
                     setState(
                         GeneralUiState.HasCharacters(
                             characters = characters,
-                            visibleCharacter = characters.first(),
-                            characterDetailsUiState = CharacterDetailsUiState.Closed
+                            visibleCharacter = characters.first()
                         )
                     )
                 }

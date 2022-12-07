@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.data.storage
+package rustam.urazov.marvelapp.feature.data.storage.marvel
 
 import androidx.room.Dao
 import androidx.room.Delete

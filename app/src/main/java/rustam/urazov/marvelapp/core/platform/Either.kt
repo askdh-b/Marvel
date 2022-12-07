@@ -13,8 +13,8 @@ sealed class Either<out L, out R> {
     fun <R> right(b: R) = Right(b)
 }
 
-suspend fun <L, R, Ro> Either<L, R>.map(
-    success: suspend (R) -> Ro
+fun <L, R, Ro> Either<L, R>.map(
+    success: (R) -> Ro
 ): Either<L, Ro> = when (this) {
     is Either.Left -> Either.Left(this.a)
     is Either.Right -> Either.Right(success(this.b))

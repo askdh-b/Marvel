@@ -16,6 +16,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
+        classpath 'com.google.gms:google-services:4.3.13'
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.22.0-RC2"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
