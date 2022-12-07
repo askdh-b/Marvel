@@ -23,13 +23,13 @@ import javax.inject.Singleton
 class ApplicationModule {
 
     companion object {
-        private const val BASE_URL = "http://gateway.marvel.com/v1/public/"
+        private const val BASE_URL_MARVEL = "http://gateway.marvel.com/v1/public/"
     }
 
     @Singleton
     @Provides
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(BASE_URL_MARVEL)
         .client(createClient())
         .addConverterFactory(MoshiConverterFactory.create())
         .addCallAdapterFactory(MarvelCallAdapterFactory())
