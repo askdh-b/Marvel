@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,6 +22,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import kotlinx.coroutines.*
 import rustam.urazov.marvelapp.R
 import rustam.urazov.marvelapp.feature.ui.theme.Background
@@ -34,7 +34,6 @@ fun GeneralScreenWithCharacters(
     charactersLazyListState: LazyListState,
     onChangeVisibleCharacter: (Int) -> Unit,
     onCharacterClick: (Int) -> Unit,
-    onLoad: () -> Unit,
     onMoreLoad: (Int) -> Unit,
 ) {
     check(uiState is GeneralUiState.HasCharacters)
@@ -192,15 +191,13 @@ fun Character(
         .clip(shape = RoundedCornerShape(16.dp))
         .clickable { onCharacterClick.invoke(characterView.id) }) {
 
-        if (characterView.thumbnail != null ) {
-            Image(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.Crop,
-                bitmap = characterView.thumbnail.asImageBitmap(),
-                contentDescription = null
-            )
-        }
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            model = characterView.thumbnail,
+            contentDescription = null
+        )
         Text(
             modifier = Modifier
                 .align(Alignment.BottomStart)

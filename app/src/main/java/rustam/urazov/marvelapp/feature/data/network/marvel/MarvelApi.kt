@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.data.network
+package rustam.urazov.marvelapp.feature.data.network.marvel
 
 import retrofit2.http.GET
 import retrofit2.http.Path

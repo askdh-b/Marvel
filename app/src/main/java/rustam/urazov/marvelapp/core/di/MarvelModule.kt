@@ -14,22 +14,29 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import rustam.urazov.marvelapp.feature.data.characters.CharactersRepository
 import rustam.urazov.marvelapp.feature.data.characters.impl.CharactersRepositoryImpl
 import rustam.urazov.marvelapp.feature.data.network.*
-import rustam.urazov.marvelapp.feature.data.storage.CharactersDatabase
-import rustam.urazov.marvelapp.feature.data.storage.CharacterEntity
+import rustam.urazov.marvelapp.feature.data.network.marvel.MarvelApi
+import rustam.urazov.marvelapp.feature.data.network.marvel.MarvelCallAdapterFactory
+import rustam.urazov.marvelapp.feature.data.network.marvel.MarvelInterceptor
+import rustam.urazov.marvelapp.feature.data.network.marvel.MarvelService
+import rustam.urazov.marvelapp.feature.data.storage.marvel.CharactersDatabase
+import rustam.urazov.marvelapp.feature.data.storage.marvel.CharacterEntity
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class ApplicationModule {
+class MarvelModule {
 
     companion object {
-        private const val BASE_URL = "http://gateway.marvel.com/v1/public/"
+        private const val BASE_URL_MARVEL = "http://gateway.marvel.com/v1/public/"
+        const val MARVEL = "marvel"
     }
 
-    @Singleton
     @Provides
+    @Singleton
+    @Named(MARVEL)
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(BASE_URL_MARVEL)
         .client(createClient())
         .addConverterFactory(MoshiConverterFactory.create())
         .addCallAdapterFactory(MarvelCallAdapterFactory())
@@ -51,19 +58,19 @@ class ApplicationModule {
         return okHttpClientBuilder.build()
     }
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideHeroesRepository(charactersRepositoryImpl: CharactersRepositoryImpl): CharactersRepository =
         charactersRepositoryImpl
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideApiService(service: MarvelService): MarvelApi = service
 
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): CharactersDatabase =
-        Room.databaseBuilder(context, CharactersDatabase::class.java, "charactersDb")
+        Room.databaseBuilder(context, CharactersDatabase::class.java, CharactersDatabase.DB_NAME)
             .allowMainThreadQueries()
             .fallbackToDestructiveMigration()
             .build()
@@ -74,4 +81,5 @@ class ApplicationModule {
 
     @Provides
     fun provideCharactersEntity() = CharacterEntity()
+
 }

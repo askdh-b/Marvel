@@ -1,25 +1,21 @@
 package rustam.urazov.marvelapp.feature.data.characters.impl
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.core.platform.Either
 import rustam.urazov.marvelapp.core.platform.NetworkHandler
 import rustam.urazov.marvelapp.core.platform.map
 import rustam.urazov.marvelapp.feature.data.characters.CharactersRepository
-import rustam.urazov.marvelapp.feature.data.storage.CharacterDao
+import rustam.urazov.marvelapp.feature.data.storage.marvel.CharacterDao
 import rustam.urazov.marvelapp.feature.data.characters.CharacterModel
-import rustam.urazov.marvelapp.feature.data.network.CharacterResponse
-import rustam.urazov.marvelapp.feature.data.network.ImageLoader
-import rustam.urazov.marvelapp.feature.data.network.MarvelApi
-import rustam.urazov.marvelapp.feature.data.storage.CharacterEntity
+import rustam.urazov.marvelapp.feature.data.network.marvel.CharacterResponse
+import rustam.urazov.marvelapp.feature.data.network.marvel.MarvelApi
+import rustam.urazov.marvelapp.feature.data.storage.marvel.CharacterEntity
 import javax.inject.Inject
 
 class CharactersRepositoryImpl @Inject constructor(
     private val networkHandler: NetworkHandler,
     private val networkService: MarvelApi,
-    private val storageService: CharacterDao,
-    private val imageLoader: ImageLoader
+    private val storageService: CharacterDao
 ) : CharactersRepository {
 
     override suspend fun getCharacterDetails(characterId: Int): Either<Failure, CharacterModel> = try {
@@ -69,7 +65,6 @@ class CharactersRepositoryImpl @Inject constructor(
         Either.Left(Failure.NoDataError)
     }
 
-
     private suspend fun getCharacterFromDataStore(characterId: Int): CharacterEntity =
         storageService.getCharacter(characterId)
 
@@ -90,26 +85,19 @@ class CharactersRepositoryImpl @Inject constructor(
         storageService.updateCharacters(characters)
     }
 
-    private suspend fun toCharacter(characterResponse: CharacterResponse): CharacterModel =
+    private fun toCharacter(characterResponse: CharacterResponse): CharacterModel =
         CharacterModel(
             id = characterResponse.id,
             name = characterResponse.name,
             description = characterResponse.description,
-            thumbnail = imageLoad(characterResponse.thumbnail.toImageUri())
+            thumbnail = characterResponse.thumbnail.toImageUri()
         )
-
-    private suspend fun imageLoad(url: String): Bitmap? = imageLoader.loadImage(url)
 
     private fun toCharacter(characterEntity: CharacterEntity): CharacterModel = CharacterModel(
         id = characterEntity.chId,
         name = characterEntity.name,
         description = characterEntity.description,
-        thumbnail = toBitmap(characterEntity.thumbnail)
+        thumbnail = characterEntity.thumbnail
     )
 
-    private fun toBitmap(image: ByteArray): Bitmap? =
-        when (image.isEmpty()) {
-            true -> null
-            false -> BitmapFactory.decodeByteArray(image, 0, image.size)
-        }
 }

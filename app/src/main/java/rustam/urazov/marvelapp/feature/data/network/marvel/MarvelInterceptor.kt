@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.data.network
+package rustam.urazov.marvelapp.feature.data.network.marvel
 
 import okhttp3.*
 import java.math.BigInteger
@@ -19,6 +19,10 @@ private class MarvelChain(private val delegate: Interceptor.Chain) : Interceptor
     companion object {
         private const val PUBLIC_KEY = "c65bb38ee1ebf27e89cb7093bcfa6d9c"
         private const val PRIVATE_KEY = "556faf4b0e52d037de4b43451aa315013763ed40"
+        private const val TS = "ts"
+        private const val APIKEY = "apikey"
+        private const val HASH = "hash"
+        private const val MD5 = "MD5"
     }
 
     override fun call(): Call = delegate.call()
@@ -47,7 +51,7 @@ private class MarvelChain(private val delegate: Interceptor.Chain) : Interceptor
     override fun writeTimeoutMillis(): Int = delegate.writeTimeoutMillis()
 
     private fun md5(input: String): String {
-        val md = MessageDigest.getInstance("MD5")
+        val md = MessageDigest.getInstance(MD5)
         return BigInteger(1, md.digest(input.toByteArray())).toString(16).padStart(32, '0')
     }
 
@@ -58,9 +62,10 @@ private class MarvelChain(private val delegate: Interceptor.Chain) : Interceptor
     private fun buildUrl(url: HttpUrl): HttpUrl {
         val ts = (Math.random() * 1000).toInt().toString()
         return url.newBuilder()
-            .addQueryParameter("ts", ts)
-            .addQueryParameter("apikey", PUBLIC_KEY)
-            .addQueryParameter("hash", md5(compose(ts)))
+            .addQueryParameter(TS, ts)
+            .addQueryParameter(APIKEY, PUBLIC_KEY)
+            .addQueryParameter(HASH, md5(compose(ts)))
             .build()
     }
+
 }

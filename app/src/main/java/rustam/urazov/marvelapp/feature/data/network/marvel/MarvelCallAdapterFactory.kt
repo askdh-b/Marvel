@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.data.network
+package rustam.urazov.marvelapp.feature.data.network.marvel
 
 import okhttp3.Request
 import okhttp3.ResponseBody
@@ -50,6 +50,10 @@ private class ResultCallWrapper<F, T>(
     private val delegate: Call<T>
 ) : Call<Either<Failure, F>> {
 
+    companion object {
+        private const val UNEXPECTED_ERROR = "Unexpected error"
+    }
+
     override fun clone(): Call<Either<Failure, F>> = ResultCallWrapper(delegate.clone())
 
     override fun execute(): Response<Either<Failure, F>> = wrapResponse(delegate.execute())
@@ -73,7 +77,6 @@ private class ResultCallWrapper<F, T>(
             Response.success(Either.Left(Failure.UnexpectedError) as Either<Failure, F>)
         )
     }
-
 
     override fun isExecuted(): Boolean = delegate.isExecuted
 
@@ -101,5 +104,5 @@ private class ResultCallWrapper<F, T>(
     }
 
     private fun parseErrorBody(responseBody: ResponseBody?): String =
-        responseBody?.string() ?: "Unexpected error"
+        responseBody?.string() ?: UNEXPECTED_ERROR
 }

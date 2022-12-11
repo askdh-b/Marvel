@@ -1,4 +1,4 @@
-package rustam.urazov.marvelapp.feature.data.network
+package rustam.urazov.marvelapp.feature.data.network.marvel
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
