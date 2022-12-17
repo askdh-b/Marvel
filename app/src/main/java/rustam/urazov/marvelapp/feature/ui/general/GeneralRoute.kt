@@ -3,6 +3,7 @@ package rustam.urazov.marvelapp.feature.ui.general
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -10,16 +11,17 @@ import androidx.navigation.NavController
 import rustam.urazov.marvelapp.feature.ui.ErrorDialog
 import rustam.urazov.marvelapp.feature.ui.ErrorDialogState
 import rustam.urazov.marvelapp.feature.ui.MarvelDestinations
-import rustam.urazov.marvelapp.feature.ui.theme.Background
 
 @Composable
 fun GeneralRoute(
     generalViewModel: GeneralViewModel,
-    navController: NavController
+    navController: NavController,
+    isExpanded: Boolean
 ) {
     val uiState by generalViewModel.state.collectAsState()
     val dialogState by generalViewModel.dialogState.collectAsState()
     GeneralRoute(
+        isExpanded = isExpanded,
         uiState = uiState,
         dialogState = dialogState,
         onChangeVisibleHero = { generalViewModel.changeVisibleHero(it) },
@@ -27,10 +29,12 @@ fun GeneralRoute(
         onMoreLoad = { generalViewModel.load(it) },
         onErrorDismiss = { generalViewModel.closeDialog() }
     )
+
 }
 
 @Composable
 private fun GeneralRoute(
+    isExpanded: Boolean,
     uiState: GeneralUiState,
     dialogState: ErrorDialogState,
     onChangeVisibleHero: (Int) -> Unit,
@@ -40,12 +44,10 @@ private fun GeneralRoute(
 ) {
     val generalListLazyListState = rememberLazyListState()
 
-    Surface(color = Background) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+    Surface(color = MaterialTheme.colors.background) {
+        Column(modifier = Modifier.fillMaxSize()) {
             GeneralRoute(
+                isExpanded = isExpanded,
                 uiState = uiState,
                 dialogState = dialogState,
                 charactersLazyListState = generalListLazyListState,
@@ -60,6 +62,7 @@ private fun GeneralRoute(
 
 @Composable
 private fun GeneralRoute(
+    isExpanded: Boolean,
     uiState: GeneralUiState,
     dialogState: ErrorDialogState,
     charactersLazyListState: LazyListState,
@@ -71,15 +74,16 @@ private fun GeneralRoute(
     when (uiState) {
         is GeneralUiState.HasCharacters -> {
             GeneralScreenWithCharacters(
-                uiState = uiState,
+                isExpanded = isExpanded,
+                characters = uiState.characters,
                 charactersLazyListState = charactersLazyListState,
                 onChangeVisibleCharacter = onChangeVisibleHero,
                 onCharacterClick = onHeroClick,
                 onMoreLoad = onMoreLoad
             )
         }
-        GeneralUiState.Loading -> GeneralLoadingScreen()
-        GeneralUiState.NoCharacters -> GeneralScreenWithoutCharacters()
+        GeneralUiState.Loading -> GeneralLoadingScreen(isExpanded)
+        GeneralUiState.NoCharacters -> GeneralScreenWithoutCharacters(isExpanded)
     }
     ErrorDialog(state = dialogState, onOkClick = onErrorDismiss, onDismiss = onErrorDismiss)
 }

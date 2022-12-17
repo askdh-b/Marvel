@@ -10,28 +10,33 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import rustam.urazov.marvelapp.feature.ui.ErrorDialog
 import rustam.urazov.marvelapp.feature.ui.ErrorDialogState
-import rustam.urazov.marvelapp.feature.ui.MarvelDestinations
 import rustam.urazov.marvelapp.feature.ui.theme.Background
 
 @Composable
 fun CharacterDetailsRoute(
     viewModel: CharacterDetailsViewModel,
     characterId: Int,
-    navController: NavController
+    navController: NavController,
+    isExpanded: Boolean,
+    rtl: Boolean
 ) {
     val uiState by viewModel.state.collectAsState()
     val dialogState by viewModel.dialogState.collectAsState()
     CharacterDetailsRoute(
+        isExpanded = isExpanded,
+        rtl = rtl,
         uiState = uiState,
         dialogState = dialogState,
         onLoad = { viewModel.load(characterId) },
-        onCLose = { navController.navigate(MarvelDestinations.GENERAL_ROUTE) },
+        onCLose = { navController.navigateUp() },
         onErrorDismiss = { viewModel.closeDialog() }
     )
 }
 
 @Composable
 fun CharacterDetailsRoute(
+    isExpanded: Boolean,
+    rtl: Boolean,
     uiState: CharacterDetailsUiState,
     dialogState: ErrorDialogState,
     onLoad: () -> Unit,
@@ -42,13 +47,13 @@ fun CharacterDetailsRoute(
         Column(modifier = Modifier.fillMaxSize()) {
             when (uiState) {
                 CharacterDetailsUiState.Closed -> onCLose.invoke()
-                is CharacterDetailsUiState.HasData -> CharacterDetailsScreen(character = uiState.character) {
+                is CharacterDetailsUiState.HasData -> CharacterDetailsScreen(isExpanded = isExpanded, rtl = rtl, character = uiState.character) {
                     onCLose.invoke()
                 }
-                CharacterDetailsUiState.Loading -> CharacterDetailsLoadingScreen(onLoad = onLoad) {
+                CharacterDetailsUiState.Loading -> CharacterDetailsLoadingScreen(rtl = rtl, onLoad = onLoad) {
                     onCLose.invoke()
                 }
-                CharacterDetailsUiState.NoData -> CharacterDetailsScreenWithoutContent {
+                CharacterDetailsUiState.NoData -> CharacterDetailsScreenWithoutContent(rtl = rtl) {
                     onCLose.invoke()
                 }
             }

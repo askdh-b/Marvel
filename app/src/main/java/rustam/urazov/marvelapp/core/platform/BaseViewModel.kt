@@ -3,6 +3,7 @@ package rustam.urazov.marvelapp.core.platform
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import rustam.urazov.marvelapp.R
 import rustam.urazov.marvelapp.core.exception.Failure
 import rustam.urazov.marvelapp.feature.ui.ErrorDialogEvent
 import rustam.urazov.marvelapp.feature.ui.ErrorDialogState
@@ -29,14 +30,17 @@ abstract class BaseViewModel<T : UiState, in E : UiEvent> : ViewModel() {
             when (event) {
                 ErrorDialogEvent.Close -> setState(ErrorDialogState.Invisible)
                 is ErrorDialogEvent.Open -> setState(
-                    ErrorDialogState.Visible(
-                        when (event.failure) {
-                            Failure.ConnectionError -> "Please check your network connection"
-                            is Failure.Error -> event.failure.message
-                            Failure.NoDataError -> "Data not found"
-                            Failure.UnexpectedError -> "Unexpected error"
-                        }
-                    )
+                    if (event.failure !is Failure.Error) {
+                        ErrorDialogState.Visible(
+                            messageId = when (event.failure) {
+                                Failure.ConnectionError -> R.string.connection_error
+                                Failure.NoDataError -> R.string.no_data_error
+                                else -> R.string.unexpected_error
+                            }
+                        )
+                    } else {
+                        ErrorDialogState.Visible(message = event.failure.message)
+                    }
                 )
             }
 

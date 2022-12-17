@@ -18,21 +18,22 @@ class CharactersRepositoryImpl @Inject constructor(
     private val storageService: CharacterDao
 ) : CharactersRepository {
 
-    override suspend fun getCharacterDetails(characterId: Int): Either<Failure, CharacterModel> = try {
-        when (networkHandler.isNetworkAvailable()) {
-            true -> {
-                val result = networkService.characterDetails(characterId)
-                    .map { toCharacter(it.charactersData.result[0]) }
-                when (result.isRight) {
-                    true -> result
-                    false -> Either.Right(toCharacter(getCharacterFromDataStore(characterId)))
+    override suspend fun getCharacterDetails(characterId: Int): Either<Failure, CharacterModel> =
+        try {
+            when (networkHandler.isNetworkAvailable()) {
+                true -> {
+                    val result = networkService.characterDetails(characterId)
+                        .map { toCharacter(it.charactersData.result[0]) }
+                    when (result.isRight) {
+                        true -> result
+                        false -> Either.Right(toCharacter(getCharacterFromDataStore(characterId)))
+                    }
                 }
+                false -> Either.Right(toCharacter(getCharacterFromDataStore(characterId)))
             }
-            false -> Either.Right(toCharacter(getCharacterFromDataStore(characterId)))
+        } catch (e: Exception) {
+            Either.Left(Failure.NoDataError)
         }
-    } catch (e: Exception) {
-        Either.Left(Failure.NoDataError)
-    }
 
     override suspend fun getCharacters(offset: Int): Either<Failure, List<CharacterModel>> = try {
         when (networkHandler.isNetworkAvailable()) {
@@ -45,7 +46,7 @@ class CharactersRepositoryImpl @Inject constructor(
                         result
                     }
                     false -> {
-                        val characters = getCharactersFromDataStore(offset)
+                        val characters = getCharactersFromDataStore()
                         when (characters.isEmpty()) {
                             true -> Either.Left(Failure.NoDataError)
                             false -> Either.Right(characters.map { toCharacter(it) })
@@ -54,7 +55,7 @@ class CharactersRepositoryImpl @Inject constructor(
                 }
             }
             false -> {
-                val characters = getCharactersFromDataStore(offset)
+                val characters = getCharactersFromDataStore()
                 when (characters.isEmpty()) {
                     true -> Either.Left(Failure.NoDataError)
                     false -> Either.Right(characters.map { toCharacter(it) })
@@ -68,14 +69,13 @@ class CharactersRepositoryImpl @Inject constructor(
     private suspend fun getCharacterFromDataStore(characterId: Int): CharacterEntity =
         storageService.getCharacter(characterId)
 
-    private suspend fun getCharactersFromDataStore(offset: Int): List<CharacterEntity> =
-        storageService.getCharacters(offset)
+    private suspend fun getCharactersFromDataStore(): List<CharacterEntity> =
+        storageService.getCharacters()
 
     private suspend fun saveCharacters(characters: List<CharacterEntity>) =
-        when (characters.size == 20) {
-            true -> updateCharacters(characters)
-            false -> insertCharacters(characters)
-        }
+        if (!getCharactersFromDataStore().map { toCharacter(it) }
+                .containsAll(characters.map { toCharacter(it) })) insertCharacters(characters)
+        else updateCharacters(characters)
 
     private suspend fun insertCharacters(characters: List<CharacterEntity>) {
         storageService.insertCharacters(characters)

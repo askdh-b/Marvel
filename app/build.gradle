@@ -34,6 +34,13 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion '1.3.1'
     }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
 }
 
 dependencies {
@@ -78,8 +85,8 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-compose:$hilt_compose_version"
 
     // material3
-    implementation "androidx.compose.material3:material3:1.1.0-alpha02"
-    implementation "androidx.compose.material3:material3-window-size-class:1.1.0-alpha02"
+    implementation "androidx.compose.material3:material3:1.1.0-alpha03"
+    implementation "androidx.compose.material3:material3-window-size-class:1.1.0-alpha03"
 
     // navigation
     implementation "androidx.navigation:navigation-compose:2.6.0-alpha04"
@@ -87,6 +94,7 @@ dependencies {
     // appcompanist
     implementation "com.google.accompanist:accompanist-swiperefresh:$appcompanist_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$appcompanist_version"
+    implementation "com.google.accompanist:accompanist-navigation-animation:$appcompanist_version"
 
     // common
     implementation 'androidx.core:core-ktx:1.9.0'

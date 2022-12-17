@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import rustam.urazov.marvelapp.feature.data.messages.MessagesRepository
@@ -40,27 +39,14 @@ class MessagesModule {
         .addConverterFactory(MoshiConverterFactory.create())
         .build()
 
-    private fun createClient(): OkHttpClient {
-        val okHttpClientBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-
-        if (rustam.urazov.marvelapp.BuildConfig.DEBUG) {
-
-            val loggingInterceptor =
-                HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
-
-            okHttpClientBuilder
-                .addInterceptor(loggingInterceptor)
-                .addInterceptor { chain ->
-                    chain.proceed(
-                        chain.request().newBuilder()
-                            .addHeader(AUTHORIZATION, KEY)
-                            .build()
-                    )
-                }
-        }
-
-        return okHttpClientBuilder.build()
-    }
+    private fun createClient(): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            chain.proceed(
+                chain.request().newBuilder()
+                    .addHeader(AUTHORIZATION, KEY)
+                    .build()
+            )
+        }.build()
 
     @Provides
     @Singleton

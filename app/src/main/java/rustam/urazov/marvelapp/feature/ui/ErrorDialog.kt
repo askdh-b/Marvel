@@ -1,5 +1,6 @@
 package rustam.urazov.marvelapp.feature.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,7 +42,10 @@ fun ErrorDialog(
             },
             title = {
                 Text(
-                    text = state.message,
+                    text = when (state.messageId == null) {
+                        true -> state.message ?: stringResource(id = R.string.unexpected_error)
+                        false -> stringResource(id = state.messageId)
+                    },
                     color = Color.Black,
                     fontSize = 12.sp
                 )
@@ -51,7 +55,7 @@ fun ErrorDialog(
 }
 
 sealed interface ErrorDialogState : UiState {
-    data class Visible(val message: String) : ErrorDialogState
+    data class Visible(@StringRes val messageId: Int? = null, val message: String? = null) : ErrorDialogState
     object Invisible : ErrorDialogState
 }
 

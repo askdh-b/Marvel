@@ -50,10 +50,6 @@ private class ResultCallWrapper<F, T>(
     private val delegate: Call<T>
 ) : Call<Either<Failure, F>> {
 
-    companion object {
-        private const val UNEXPECTED_ERROR = "Unexpected error"
-    }
-
     override fun clone(): Call<Either<Failure, F>> = ResultCallWrapper(delegate.clone())
 
     override fun execute(): Response<Either<Failure, F>> = wrapResponse(delegate.execute())
@@ -97,12 +93,18 @@ private class ResultCallWrapper<F, T>(
                     false -> Response.success(Either.Left(Failure.NoDataError) as Either<Failure, F>)
                 }
             }
-            false -> Response.success(Either.Left(Failure.Error(parseErrorBody(response.errorBody()))) as Either<Failure, F>)
+            false -> {
+                val failure = parseErrorBody(response.errorBody())
+                when (failure != null) {
+                    true -> Response.success(Either.Left(Failure.Error(failure)))
+                    false -> Response.success(Either.Left(Failure.UnexpectedError))
+                }
+            }
         }
     } catch (e: Exception) {
         Response.success(Either.Left(Failure.UnexpectedError) as Either<Failure, F>)
     }
 
-    private fun parseErrorBody(responseBody: ResponseBody?): String =
-        responseBody?.string() ?: UNEXPECTED_ERROR
+    private fun parseErrorBody(responseBody: ResponseBody?): String? =
+        responseBody?.string()
 }

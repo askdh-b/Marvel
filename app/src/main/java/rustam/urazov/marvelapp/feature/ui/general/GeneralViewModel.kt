@@ -37,7 +37,7 @@ class GeneralViewModel @Inject constructor(private val charactersRepository: Cha
     }
 
     fun changeVisibleHero(visibleCharacterId: Int) =
-        sendEvent(GeneralScreenUiEvent.ChangeVisibleCharacter(visibleCharacterId))
+        sendEvent(GeneralScreenUiEvent.ChangeCentralVisibleCharacter(visibleCharacterId))
 
 
     private fun load() {
@@ -55,7 +55,7 @@ class GeneralViewModel @Inject constructor(private val charactersRepository: Cha
         override fun reduce(oldState: GeneralUiState, event: GeneralScreenUiEvent) {
             when (event) {
                 GeneralScreenUiEvent.LoadCharacters -> setState(GeneralUiState.Loading)
-                is GeneralScreenUiEvent.ChangeVisibleCharacter -> setState(
+                is GeneralScreenUiEvent.ChangeCentralVisibleCharacter -> setState(
                     (oldState as GeneralUiState.HasCharacters).copy(
                         visibleCharacter = oldState.characters.find { it.id == event.characterId }
                             ?: oldState.characters.first())
@@ -63,7 +63,7 @@ class GeneralViewModel @Inject constructor(private val charactersRepository: Cha
                 is GeneralScreenUiEvent.AddCharacters -> {
                     val characters: MutableList<CharacterView> = mutableListOf()
                     if (oldState is GeneralUiState.HasCharacters) characters.addAll(oldState.characters)
-                    characters.addAll(event.characters)
+                    if (!characters.containsAll(event.characters)) characters.addAll(event.characters)
 
                     setState(
                         GeneralUiState.HasCharacters(

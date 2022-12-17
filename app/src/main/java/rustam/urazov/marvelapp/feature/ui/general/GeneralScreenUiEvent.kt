@@ -4,7 +4,7 @@ import rustam.urazov.marvelapp.core.platform.UiEvent
 
 sealed class GeneralScreenUiEvent : UiEvent {
     data class AddCharacters(val characters: List<CharacterView>) : GeneralScreenUiEvent()
-    data class ChangeVisibleCharacter(val characterId: Int) : GeneralScreenUiEvent()
+    data class ChangeCentralVisibleCharacter(val characterId: Int) : GeneralScreenUiEvent()
     object LoadCharacters : GeneralScreenUiEvent()
     object HideCharactersList : GeneralScreenUiEvent()
 }

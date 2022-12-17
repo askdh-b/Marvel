@@ -6,13 +6,12 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class MessageBody(
     @Json val to: String,
-    @Json val notification: Notification
+    @Json val data: Data
 )
 
 @JsonClass(generateAdapter = true)
-data class Notification(
-    @Json val title: String,
-    @Json val body: String
+data class Data(
+    @Json val id: String,
 )
 
 @JsonClass(generateAdapter = true)

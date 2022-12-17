@@ -1,27 +1,6 @@
 <resources>
     <string name="app_name">Marvel App</string>
 
-    <!-- heroes -->
-    <string name="spider_man">Spider-Man</string>
-    <string name="captain_america">Captain America</string>
-    <string name="shang_chi">Shang-Chi</string>
-    <string name="loki">Loki</string>
-    <string name="daredevil">Daredevil</string>
-
-    <!-- heroes desc -->
-    <string name="spider_man_desc">Our friendly neighborhood hero swings into the MCU in his iconic suit.</string>
-    <string name="captain_america_desc">Sam Wilson, formerly the Falcon, takes on the mantle of Captain America as he teams up with his fellow Avengers.</string>
-    <string name="shang_chi_desc">Shang-Chi</string>
-    <string name="loki_desc">God of Mischief and brother to Thor, Loki’s tricks and schemes wreak havoc across the realms.</string>
-    <string name="daredevil_desc">Blinded in a childhood accident, attorney-at-law Matt Murdock protects Hell’s Kitchen as the masked vigilante, Daredevil.</string>
-
-    <!-- images uri -->
-    <string name="spider_man_image">https://terrigen-cdn-dev.marvel.com/content/prod/1x/spidey02_ons_crd_01.jpg</string>
-    <string name="captain_america_image">https://terrigen-cdn-dev.marvel.com/content/prod/1x/cap_ons_crd_01.jpg</string>
-    <string name="shang_chi_image">https://terrigen-cdn-dev.marvel.com/content/prod/1x/242shc_ons_crd_01.jpg</string>
-    <string name="loki_image">https://terrigen-cdn-dev.marvel.com/content/prod/1x/017lok_ons_crd_03.jpg</string>
-    <string name="daredevil_image">https://terrigen-cdn-dev.marvel.com/content/prod/1x/026ddm_ons_crd_02_1.jpg</string>
-
     <!-- common -->
     <string name="choose_your_hero">Choose your hero</string>
     <string name="no_characters">No characters</string>
@@ -29,6 +8,8 @@
     <string name="ok">OK</string>
 
     <!-- errors -->
+    <string name="connection_error">Please check your network connection</string>
     <string name="load_error">Failed to load page. Please try again later</string>
     <string name="no_data_error">Data not found</string>
+    <string name="unexpected_error">Unexpected error</string>
 </resources>

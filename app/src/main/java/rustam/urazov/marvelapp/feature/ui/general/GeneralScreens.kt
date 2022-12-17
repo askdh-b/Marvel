@@ -6,7 +6,6 @@ import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,23 +24,24 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.*
 import rustam.urazov.marvelapp.R
-import rustam.urazov.marvelapp.feature.ui.theme.Background
 import rustam.urazov.marvelapp.feature.ui.theme.CharacterColors
+import rustam.urazov.marvelapp.feature.ui.theme.Shapes
+import rustam.urazov.marvelapp.feature.ui.theme.Typography
 
 @Composable
 fun GeneralScreenWithCharacters(
-    uiState: GeneralUiState,
+    isExpanded: Boolean,
+    characters: List<CharacterView>,
     charactersLazyListState: LazyListState,
     onChangeVisibleCharacter: (Int) -> Unit,
     onCharacterClick: (Int) -> Unit,
     onMoreLoad: (Int) -> Unit,
 ) {
-    check(uiState is GeneralUiState.HasCharacters)
-
     Column(modifier = Modifier.fillMaxSize()) {
-        Logo()
+        Logo(isExpanded)
         Content(
-            characters = uiState.characters,
+            isExpanded = isExpanded,
+            characters = characters,
             charactersLazyListState = charactersLazyListState,
             onChangeVisibleCharacter = onChangeVisibleCharacter,
             onCharacterClick = onCharacterClick,
@@ -51,17 +51,17 @@ fun GeneralScreenWithCharacters(
 }
 
 @Composable
-fun GeneralLoadingScreen() {
+fun GeneralLoadingScreen(isExpanded: Boolean) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Logo()
+        Logo(isExpanded)
         CentralProgressIndicator()
     }
 }
 
 @Composable
-fun GeneralScreenWithoutCharacters() {
+fun GeneralScreenWithoutCharacters(isExpanded: Boolean) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Logo()
+        Logo(isExpanded)
         Box(modifier = Modifier.fillMaxSize()) {
             Text(
                 modifier = Modifier.align(Center),
@@ -76,24 +76,39 @@ fun GeneralScreenWithoutCharacters() {
 }
 
 @Composable
-private fun Logo() {
+private fun Logo(isExpanded: Boolean) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            modifier = Modifier.padding(vertical = 48.dp),
-            painter = painterResource(id = R.drawable.marvel_256),
-            contentDescription = null
-        )
+        when (isExpanded) {
+            true -> ExpandedLogo()
+            false -> DefaultLogo()
+        }
         Text(
             text = stringResource(id = R.string.choose_your_hero),
-            fontFamily = FontFamily.Monospace,
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
+            style = Typography.h1,
+            color = MaterialTheme.colors.secondary,
         )
     }
+}
+
+@Composable
+private fun DefaultLogo() {
+    Image(
+        modifier = Modifier.padding(vertical = 48.dp),
+        painter = painterResource(id = R.drawable.marvel_256),
+        contentDescription = null
+    )
+}
+
+@Composable
+private fun ExpandedLogo() {
+    Image(
+        modifier = Modifier.padding(vertical = 12.dp),
+        painter = painterResource(id = R.drawable.marvel_256),
+        contentDescription = null
+    )
 }
 
 @Composable
@@ -108,24 +123,28 @@ fun CentralProgressIndicator() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Content(
+    isExpanded: Boolean,
     characters: List<CharacterView>,
     charactersLazyListState: LazyListState,
     onChangeVisibleCharacter: (Int) -> Unit,
     onCharacterClick: (Int) -> Unit,
     onMoreLoad: (Int) -> Unit,
 ) {
-    val firstVisibleCharacterIndex =
-        remember { derivedStateOf { charactersLazyListState.firstVisibleItemIndex } }.value
+
+    val firstVisibleCharacterIndex by
+    remember { derivedStateOf { charactersLazyListState.firstVisibleItemIndex } }
+    val visibleCharactersCount by remember { derivedStateOf { charactersLazyListState.layoutInfo.visibleItemsInfo.size } }
 
     onChangeVisibleCharacter.invoke(characters[firstVisibleCharacterIndex].id)
 
-    if (firstVisibleCharacterIndex == characters.lastIndex) onMoreLoad.invoke(
-        firstVisibleCharacterIndex + 1
+    if (firstVisibleCharacterIndex + visibleCharactersCount - 1 == characters.lastIndex) onMoreLoad.invoke(
+        firstVisibleCharacterIndex + visibleCharactersCount
     )
 
-    Surface(color = Background) {
+    Surface(color = Color.Transparent) {
         Triangle(color = CharacterColors[firstVisibleCharacterIndex % 5])
         CharactersFeed(
+            isExpanded = isExpanded,
             characters = characters,
             charactersLazyListState = charactersLazyListState,
             snapperFlingBehavior = rememberSnapFlingBehavior(lazyListState = charactersLazyListState),
@@ -149,6 +168,7 @@ fun Triangle(color: Color) {
 
 @Composable
 fun CharactersFeed(
+    isExpanded: Boolean,
     characters: List<CharacterView>,
     charactersLazyListState: LazyListState,
     snapperFlingBehavior: FlingBehavior,
@@ -161,13 +181,22 @@ fun CharactersFeed(
         flingBehavior = snapperFlingBehavior
     ) {
         items(characters) { character ->
-            Character(
-                characterView = character,
-                onCharacterClick = onCharacterClick,
-                modifier = Modifier
-                    .fillParentMaxSize()
-                    .padding(vertical = 36.dp, horizontal = 18.dp)
-            )
+            when (isExpanded) {
+                true -> ExpandedCharacter(
+                    characterView = character,
+                    onCharacterClick = onCharacterClick,
+                    modifier = Modifier
+                        .fillParentMaxWidth(0.3f)
+                        .padding(vertical = 36.dp, horizontal = 18.dp)
+                )
+                false -> Character(
+                    characterView = character,
+                    onCharacterClick = onCharacterClick,
+                    modifier = Modifier
+                        .fillParentMaxSize()
+                        .padding(vertical = 36.dp, horizontal = 18.dp)
+                )
+            }
         }
         item {
             Box(
@@ -188,7 +217,7 @@ fun Character(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier
-        .clip(shape = RoundedCornerShape(16.dp))
+        .clip(shape = Shapes.large)
         .clickable { onCharacterClick.invoke(characterView.id) }) {
 
         AsyncImage(
@@ -203,10 +232,37 @@ fun Character(
                 .align(Alignment.BottomStart)
                 .padding(start = 18.dp, bottom = 36.dp),
             text = characterView.name,
-            fontFamily = FontFamily.Monospace,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 32.sp,
+            style = Typography.h1,
+            color = MaterialTheme.colors.primary,
+        )
+    }
+}
+
+@Composable
+private fun ExpandedCharacter(
+    characterView: CharacterView,
+    onCharacterClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier
+        .fillMaxHeight()
+        .clip(shape = Shapes.large)
+        .clickable { onCharacterClick.invoke(characterView.id) }) {
+
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            model = characterView.thumbnail,
+            contentDescription = null
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 9.dp, bottom = 18.dp),
+            text = characterView.name,
+            style = Typography.body1,
+            color = MaterialTheme.colors.primary
         )
     }
 }
