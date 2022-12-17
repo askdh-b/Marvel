@@ -1,0 +1,33 @@
+apply plugin: "io.gitlab.arturbosch.detekt"
+
+detekt {
+    toolVersion = "1.22.0-RC2"
+    source = files("src/main/java")
+    parallel = false
+    config = files("$rootDir/detekt-config.yml")
+    buildUponDefaultConfig = false
+    allRules = false
+    baseline = file("path/to/baseline.xml")
+    disableDefaultRuleSets = false
+    debug = false
+    ignoreFailures = false
+    ignoredBuildTypes = ["release"]
+    ignoredFlavors = ["production"]
+    ignoredVariants = ["productionRelease"]
+    basePath = projectDir
+}
+
+tasks.named("detekt").configure {
+    reports {
+        xml.required.set(true)
+        xml.outputLocation.set(file("build/reports/detekt.xml"))
+        html.required.set(true)
+        html.outputLocation.set(file("build/reports/detekt.html"))
+        txt.required.set(true)
+        txt.outputLocation.set(file("build/reports/detekt.txt"))
+        sarif.required.set(true)
+        sarif.outputLocation.set(file("build/reports/detekt.sarif"))
+        md.required.set(true)
+        md.outputLocation.set(file("build/reports/detekt.md"))
+    }
+}

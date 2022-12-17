@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Marvel App</string>
+
+    <!-- common -->
+    <string name="choose_your_hero">Choose your hero</string>
+    <string name="no_characters">No characters</string>
+    <string name="no_character_details">No character details</string>
+    <string name="ok">OK</string>
+
+    <!-- errors -->
+    <string name="connection_error">Please check your network connection</string>
+    <string name="load_error">Failed to load page. Please try again later</string>
+    <string name="no_data_error">Data not found</string>
+    <string name="unexpected_error">Unexpected error</string>
 </resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Marvel App</string>
+
+    <!-- common -->
+    <string name="choose_your_hero">Выбери своего героя</string>
+    <string name="no_characters">Персонажи не найдены</string>
+    <string name="no_character_details">Персонаж не найден</string>
+    <string name="ok">ОК</string>
+
+    <!-- errors -->
+    <string name="connection_error">Пожалуйста проверьте подключение к Сети</string>
+    <string name="load_error">Ошибка загрузки страницы. Пожалуйста повторите позже</string>
+    <string name="no_data_error">Нет данных</string>
+    <string name="unexpected_error">Неизвестная ошибка</string>
+</resources>
